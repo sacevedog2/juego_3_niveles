@@ -514,49 +514,37 @@ body {
     width: 100%;
     height: 100%;
     backface-visibility: hidden;
-    border-radius: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 12px 32px rgba(0,0,0,.2);
 }
 
 .card-front {
-    background: linear-gradient(145deg, #b33951, #9a2f44);
-    border: 4px solid #7a1f34;
-}
-
-.card-front::before {
-    content: '?';
-    font: 900 80px 'Montserrat';
-    color: rgba(255,255,255,0.9);
+    /* Background set via JS: card-back.png */
 }
 
 .card-back {
-    background: linear-gradient(145deg, #ffffff, #f0f0f0);
-    border: 4px solid #b33951;
+    /* Background set via JS: card-front.png */
     transform: rotateY(180deg);
 }
 
 .card-back .card-number {
     font: 900 72px 'Montserrat';
-    color: #b33951;
+    color: #333;
+    text-shadow: 0 2px 4px rgba(255,255,255,0.8);
 }
 
 .current-card {
-    background: linear-gradient(145deg, #ffffff, #f0f0f0);
-    border: 4px solid #b33951;
-    padding: 40px 30px;
-    border-radius: 20px;
-    font: 900 72px 'Montserrat';
-    color: #b33951;
-    text-align: center;
-    box-shadow: 0 12px 32px rgba(0,0,0,.2);
+    /* Background set via JS: card-front.png */
     min-width: 160px;
     height: 200px;
     display: flex;
     align-items: center;
     justify-content: center;
+    font: 900 72px 'Montserrat';
+    color: #333;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(255,255,255,0.8);
 }
 
 .center-content {
@@ -620,15 +608,12 @@ body {
 }
 
 .result-card {
-    background: linear-gradient(145deg, #ffffff, #f0f0f0);
-    border: 4px solid #333;
-    padding: 40px 50px;
-    border-radius: 20px;
-    font: 900 72px 'Montserrat';
-    color: #333;
-    text-align: center;
-    box-shadow: 0 12px 32px rgba(0,0,0,.2);
-    min-width: 140px;
+    /* Background set via JS: card-front.png */
+    min-width: 160px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .result-message {

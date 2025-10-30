@@ -137,7 +137,11 @@ function formatScoreValue(val) {
 }
 
 function renderCards(value) {
-    if (!cardsContainer) return;
+    console.log('renderCards llamado, cardsContainer:', cardsContainer);
+    if (!cardsContainer) {
+        console.error('cardsContainer no encontrado!');
+        return;
+    }
     // Clear existing cards
     cardsContainer.innerHTML = '';
 
@@ -151,6 +155,8 @@ function renderCards(value) {
         '×': 'assets/ui/level1/btn-times.png',
         '÷': 'assets/ui/level1/btn-divide.png'
     };
+
+    console.log('Operaciones disponibles:', availableOps);
 
     // Render only the currently available operations
     availableOps.forEach(op => {
@@ -167,6 +173,8 @@ function renderCards(value) {
         img.style.height = '100%';
         img.style.objectFit = 'contain';
         btn.appendChild(img);
+
+        console.log('Botón creado para operación:', op);
 
         btn.addEventListener('click', () => {
             // Prevent multiple selections in the same roll
@@ -196,6 +204,9 @@ function renderCards(value) {
 
         cardsContainer.appendChild(btn);
     });
+
+    console.log('Total de botones agregados:', cardsContainer.children.length);
+    console.log('Display del cardsContainer:', cardsContainer.style.display);
 
     // If no operations left, show a small message
     if (availableOps.length === 0) {
@@ -300,10 +311,22 @@ function renderLevel2() {
     const cardsRow = document.createElement('div');
     cardsRow.className = 'cards-row';
     
-    // Carta actual (izquierda)
+    // Carta actual (izquierda) - usa card-front.png de fondo
     const currentCardDiv = document.createElement('div');
     currentCardDiv.className = 'current-card';
-    currentCardDiv.textContent = currentCard;
+    currentCardDiv.style.position = 'relative';
+    currentCardDiv.style.backgroundImage = 'url(assets/ui/level2/card-front.png)';
+    currentCardDiv.style.backgroundSize = 'contain';
+    currentCardDiv.style.backgroundRepeat = 'no-repeat';
+    currentCardDiv.style.backgroundPosition = 'center';
+    
+    // Número de la carta encima de la imagen
+    const currentCardNumber = document.createElement('div');
+    currentCardNumber.textContent = currentCard;
+    currentCardNumber.style.position = 'relative';
+    currentCardNumber.style.zIndex = '2';
+    currentCardDiv.appendChild(currentCardNumber);
+    
     cardsRow.appendChild(currentCardDiv);
     
     // Contenido central (instrucción)
@@ -325,17 +348,28 @@ function renderLevel2() {
     cardFlipper.className = 'card-flipper';
     cardFlipper.id = 'nextCardFlipper';
     
-    // Cara frontal (reverso de la carta - oculta el número)
+    // Cara frontal (reverso de la carta - card-back.png con ?)
     const cardFront = document.createElement('div');
     cardFront.className = 'card-front';
+    cardFront.style.backgroundImage = 'url(assets/ui/level2/card-back.png)';
+    cardFront.style.backgroundSize = 'contain';
+    cardFront.style.backgroundRepeat = 'no-repeat';
+    cardFront.style.backgroundPosition = 'center';
     
-    // Cara trasera (muestra el número)
+    // Cara trasera (card-front.png con el número)
     const cardBack = document.createElement('div');
     cardBack.className = 'card-back';
+    cardBack.style.backgroundImage = 'url(assets/ui/level2/card-front.png)';
+    cardBack.style.backgroundSize = 'contain';
+    cardBack.style.backgroundRepeat = 'no-repeat';
+    cardBack.style.backgroundPosition = 'center';
+    
     const cardNumber = document.createElement('div');
     cardNumber.className = 'card-number';
     cardNumber.id = 'nextCardNumber';
     cardNumber.textContent = '?';
+    cardNumber.style.position = 'relative';
+    cardNumber.style.zIndex = '2';
     cardBack.appendChild(cardNumber);
     
     cardFlipper.appendChild(cardFront);
@@ -456,9 +490,23 @@ function showPredictionResult(nextCard, correct, points) {
     const resultDiv = document.createElement('div');
     resultDiv.className = 'prediction-result';
     
+    // Carta con el resultado usando card-front.png
     const cardDiv = document.createElement('div');
     cardDiv.className = 'result-card';
-    cardDiv.textContent = nextCard;
+    cardDiv.style.backgroundImage = 'url(assets/ui/level2/card-front.png)';
+    cardDiv.style.backgroundSize = 'contain';
+    cardDiv.style.backgroundRepeat = 'no-repeat';
+    cardDiv.style.backgroundPosition = 'center';
+    cardDiv.style.position = 'relative';
+    
+    const cardNumber = document.createElement('div');
+    cardNumber.textContent = nextCard;
+    cardNumber.style.position = 'relative';
+    cardNumber.style.zIndex = '2';
+    cardNumber.style.font = '900 72px Montserrat';
+    cardNumber.style.color = '#333';
+    cardNumber.style.textShadow = '0 2px 4px rgba(255,255,255,0.8)';
+    cardDiv.appendChild(cardNumber);
     
     const messageDiv = document.createElement('div');
     messageDiv.className = correct ? 'result-message correct' : 'result-message incorrect';
