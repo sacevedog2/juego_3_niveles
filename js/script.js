@@ -567,6 +567,10 @@ function startLevel3() {
         updateScoreDisplay();
     }
     
+    // Actualizar el contador de coins con el score actual
+    const coinsValue = document.getElementById('coins-value');
+    if (coinsValue) coinsValue.textContent = formatScoreValue(score);
+    
     // Ocultar elementos de nivel 2
     if (resultEl) resultEl.style.display = 'none';
     
@@ -587,15 +591,25 @@ function renderLevel3() {
     const level3Container = document.createElement('div');
     level3Container.className = 'level3-container';
     
-    // Contenedor de moneda con imagen de fondo
+    // Indicador de lanzamientos restantes debajo del header
+    const flipsRemainingDiv = document.createElement('div');
+    flipsRemainingDiv.className = 'flips-remaining-indicator';
+    flipsRemainingDiv.textContent = `Lanzamientos: ${coinFlipsRemaining}/5`;
+    if (isFirstFlip) {
+        flipsRemainingDiv.textContent += ' (Obligatorio)';
+    }
+    level3Container.appendChild(flipsRemainingDiv);
+    
+    // Contenedor de moneda con imagen de fondo (más compacto)
     const coinContainerDiv = document.createElement('div');
     coinContainerDiv.className = 'coin-container-wrapper';
     coinContainerDiv.style.position = 'relative';
-    coinContainerDiv.style.width = 'min(300px, 50vw)';
-    coinContainerDiv.style.height = 'min(300px, 50vw)';
+    coinContainerDiv.style.width = 'min(200px, 40vw)';
+    coinContainerDiv.style.height = 'min(200px, 40vw)';
     coinContainerDiv.style.display = 'flex';
     coinContainerDiv.style.alignItems = 'center';
     coinContainerDiv.style.justifyContent = 'center';
+    coinContainerDiv.style.margin = '10px auto';
     
     const coinContainerBg = document.createElement('img');
     coinContainerBg.src = 'assets/ui/level3/coin-container.png';
@@ -620,28 +634,9 @@ function renderLevel3() {
     coinContainerDiv.appendChild(coinDiv);
     level3Container.appendChild(coinContainerDiv);
     
-    // Panel de apuestas
+    // Panel de apuestas (sin banco ni lanzamientos)
     const betPanel = document.createElement('div');
     betPanel.className = 'bet-panel';
-    
-    // Info del banco y rondas
-    const betInfo = document.createElement('div');
-    betInfo.className = 'bet-info';
-    
-    const bankDisplay = document.createElement('div');
-    bankDisplay.className = 'bank-display';
-    bankDisplay.textContent = `Banco: ${formatScoreValue(score)} puntos`;
-    
-    const roundsInfo = document.createElement('div');
-    roundsInfo.className = 'rounds-info';
-    roundsInfo.textContent = `Lanzamientos restantes: ${coinFlipsRemaining}/5`;
-    if (isFirstFlip) {
-        roundsInfo.textContent += ' (Obligatorio)';
-    }
-    
-    betInfo.appendChild(bankDisplay);
-    betInfo.appendChild(roundsInfo);
-    betPanel.appendChild(betInfo);
     
     // Input de apuesta
     const betInputGroup = document.createElement('div');
@@ -832,6 +827,10 @@ function executeCoinFlip() {
         // Redondear el score y actualizar la UI
         score = Math.round(score * 100) / 100;
         updateScoreDisplay();
+        
+        // Actualizar también el contador de coins
+        const coinsValue = document.getElementById('coins-value');
+        if (coinsValue) coinsValue.textContent = formatScoreValue(score);
         
         // Actualizar estado
         coinFlipsRemaining--;

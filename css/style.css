@@ -694,9 +694,21 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
-    padding: 20px;
+    gap: 10px;
+    padding: 10px;
     width: 100%;
+    overflow: hidden;
+}
+
+.flips-remaining-indicator {
+    font: 700 min(14px, 2.5vw) 'Montserrat';
+    color: #ffffff;
+    text-align: center;
+    background: rgba(179, 57, 81, 0.8);
+    padding: 6px 16px;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 /* Moneda como imagen */
@@ -743,8 +755,8 @@ body {
 
 .bet-panel {
     background: rgba(255,255,255,0.95);
-    padding: 20px;
-    border-radius: 15px;
+    padding: 15px;
+    border-radius: 12px;
     border: 3px solid #b33951;
     box-shadow: 0 8px 24px rgba(0,0,0,.15);
     width: 100%;
@@ -754,31 +766,25 @@ body {
 .bet-info {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    margin-bottom: 20px;
+    gap: 8px;
+    margin-bottom: 12px;
 }
 
 .bank-display {
-    font: 700 18px 'Montserrat';
+    font: 700 16px 'Montserrat';
     color: #333;
     text-align: center;
     background: linear-gradient(145deg, #f0f0f0, #ffffff);
-    padding: 10px 16px;
+    padding: 8px 14px;
     border-radius: 8px;
     border: 2px solid #b33951;
-}
-
-.rounds-info {
-    font: 600 14px 'Montserrat';
-    color: #666;
-    text-align: center;
 }
 
 .bet-input-group {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-bottom: 16px;
+    gap: 8px;
+    margin-bottom: 12px;
 }
 
 .bet-label {
@@ -835,9 +841,9 @@ body {
 
 .choice-buttons {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     justify-content: center;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 .choice-btn {
