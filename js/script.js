@@ -592,20 +592,29 @@ function renderLevel3() {
     coinContainerDiv.className = 'coin-container-wrapper';
     coinContainerDiv.style.position = 'relative';
     coinContainerDiv.style.width = 'min(300px, 50vw)';
-    coinContainerDiv.style.height = 'auto';
-    coinContainerDiv.style.aspectRatio = '1';
+    coinContainerDiv.style.height = 'min(300px, 50vw)';
+    coinContainerDiv.style.display = 'flex';
+    coinContainerDiv.style.alignItems = 'center';
+    coinContainerDiv.style.justifyContent = 'center';
     
     const coinContainerBg = document.createElement('img');
     coinContainerBg.src = 'assets/ui/level3/coin-container.png';
+    coinContainerBg.style.position = 'absolute';
     coinContainerBg.style.width = '100%';
     coinContainerBg.style.height = '100%';
     coinContainerBg.style.objectFit = 'contain';
+    coinContainerBg.style.zIndex = '1';
     
-    // Moneda (inicialmente sin mostrar resultado)
-    const coinDiv = document.createElement('div');
-    coinDiv.className = 'coin-display';
+    // Moneda con imagen inicial
+    const coinDiv = document.createElement('img');
+    coinDiv.className = 'coin-image';
     coinDiv.id = 'coin';
-    coinDiv.textContent = '?';
+    coinDiv.src = 'assets/ui/level3/inicial-coin.png';
+    coinDiv.style.width = '70%';
+    coinDiv.style.height = '70%';
+    coinDiv.style.objectFit = 'contain';
+    coinDiv.style.zIndex = '2';
+    coinDiv.style.position = 'relative';
     
     coinContainerDiv.appendChild(coinContainerBg);
     coinContainerDiv.appendChild(coinDiv);
@@ -791,9 +800,8 @@ function executeCoinFlip() {
     
     const coin = document.getElementById('coin');
     
-    // Animación de lanzamiento
-    coin.classList.add('flipping');
-    coin.textContent = '...';
+    // Animación de lanzamiento - agregar clase de flip
+    coin.classList.add('coin-flipping');
     
     setTimeout(() => {
         // Generar resultado aleatorio
@@ -802,10 +810,13 @@ function executeCoinFlip() {
         // Verificar si ganó
         const won = (result === selectedCoin);
         
-        // Actualizar moneda visual
-        coin.classList.remove('flipping');
-        coin.classList.add(result);
-        coin.textContent = result === 'cara' ? 'CARA' : 'SELLO';
+        // Actualizar imagen de la moneda según resultado
+        coin.classList.remove('coin-flipping');
+        if (result === 'cara') {
+            coin.src = 'assets/ui/level3/coin-face.png';
+        } else {
+            coin.src = 'assets/ui/level3/coin-tails.png';
+        }
         
         // Calcular ganancia/pérdida
         let payout = 0;
@@ -826,12 +837,12 @@ function executeCoinFlip() {
         coinFlipsRemaining--;
         isFirstFlip = false;
         
-        // Mostrar resultado
+        // Mostrar resultado después de que se vea la moneda
         setTimeout(() => {
             showCoinFlipResult(won, payout, result);
-        }, 800);
+        }, 500);
         
-    }, 1000);
+    }, 1500);
 }
 
 function showCoinFlipResult(won, payout, result) {
@@ -842,10 +853,13 @@ function showCoinFlipResult(won, payout, result) {
     const resultDiv = document.createElement('div');
     resultDiv.className = 'flip-result';
     
-    // Moneda con resultado
-    const coinDiv = document.createElement('div');
-    coinDiv.className = `coin-display ${result}`;
-    coinDiv.textContent = result === 'cara' ? 'CARA' : 'SELLO';
+    // Moneda con resultado usando la imagen
+    const coinImg = document.createElement('img');
+    coinImg.className = 'result-coin-image';
+    coinImg.src = result === 'cara' ? 'assets/ui/level3/coin-face.png' : 'assets/ui/level3/coin-tails.png';
+    coinImg.style.width = 'min(150px, 30vw)';
+    coinImg.style.height = 'min(150px, 30vw)';
+    coinImg.style.objectFit = 'contain';
     
     const messageDiv = document.createElement('div');
     messageDiv.className = won ? 'flip-message win' : 'flip-message lose';
@@ -860,7 +874,7 @@ function showCoinFlipResult(won, payout, result) {
     bankDiv.className = 'bank-display';
     bankDiv.textContent = `Banco actual: ${formatScoreValue(score)} puntos`;
     
-    resultDiv.appendChild(coinDiv);
+    resultDiv.appendChild(coinImg);
     resultDiv.appendChild(messageDiv);
     resultDiv.appendChild(bankDiv);
     
@@ -881,7 +895,7 @@ function showCoinFlipResult(won, payout, result) {
         // Puede continuar
         continueBtn.textContent = 'Continuar';
         continueBtn.addEventListener('click', () => {
-            // Reset selección
+            // Reset selección y volver a mostrar imagen inicial
             selectedCoin = null;
             renderLevel3();
         });
