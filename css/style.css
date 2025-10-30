@@ -63,7 +63,7 @@ body {
 .counter {
     display: flex;
     align-items: center;
-    gap: min(10px, 1vw);
+    position: relative;
 }
 
 .counter-icon {
@@ -73,10 +73,14 @@ body {
 }
 
 .counter-value {
-    font-size: min(24px, 3vw);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: min(22px, 3vw);
     color: #ffffff;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
     font-weight: bold;
+    z-index: 1;
 }
 
 /* Level header */
