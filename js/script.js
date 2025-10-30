@@ -604,12 +604,12 @@ function renderLevel3() {
     const coinContainerDiv = document.createElement('div');
     coinContainerDiv.className = 'coin-container-wrapper';
     coinContainerDiv.style.position = 'relative';
-    coinContainerDiv.style.width = 'min(200px, 40vw)';
-    coinContainerDiv.style.height = 'min(200px, 40vw)';
+    coinContainerDiv.style.width = 'min(160px, 35vw)';
+    coinContainerDiv.style.height = 'min(160px, 35vw)';
     coinContainerDiv.style.display = 'flex';
     coinContainerDiv.style.alignItems = 'center';
     coinContainerDiv.style.justifyContent = 'center';
-    coinContainerDiv.style.margin = '10px auto';
+    coinContainerDiv.style.margin = '5px auto';
     
     const coinContainerBg = document.createElement('img');
     coinContainerBg.src = 'assets/ui/level3/coin-container.png';
@@ -685,12 +685,7 @@ function renderLevel3() {
     betInputGroup.appendChild(betSlider);
     betPanel.appendChild(betInputGroup);
     
-    // Elección: Cara o Sello
-    const choiceLabel = document.createElement('div');
-    choiceLabel.className = 'bet-label';
-    choiceLabel.textContent = 'Elige tu predicción:';
-    betPanel.appendChild(choiceLabel);
-    
+    // Elección: Cara o Sello (sin título)
     const choiceButtons = document.createElement('div');
     choiceButtons.className = 'choice-buttons';
     
