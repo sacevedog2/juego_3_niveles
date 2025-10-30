@@ -2,43 +2,63 @@
 <html lang="en">
 
 <head>
-
-    <title>CODE WITH HOSSEIN</title>
-
+    <title>Juego 3 Niveles</title>
     <!-- Montserrat Font -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
-    
     <!-- CSS File -->
     <link rel="stylesheet" href="css/style.css">
-
 </head>
 
 <body>
     <div class="game-screen level-1">
+        <!-- Top counters bar - fixed across all levels -->
+        <div class="counters-bar">
+            <div class="counter level-counter">
+                <img src="assets/ui/common/ico-level.png" alt="Nivel" class="counter-icon">
+                <span class="counter-value" id="level-value">1</span>
+            </div>
+            <div class="counter score-counter">
+                <img src="assets/ui/common/ico-score.png" alt="Puntaje" class="counter-icon">
+                <span class="counter-value" id="score-value">0</span>
+            </div>
+            <div class="counter coins-counter">
+                <img src="assets/ui/common/ico-coins.png" alt="Monedas" class="counter-icon">
+                <span class="counter-value" id="coins-value">0</span>
+            </div>
+        </div>
+
         <div class="wrapper">
-        <div id="score" class="score" aria-live="polite"></div>
+            <!-- Level header image -->
+            <div class="level-header">
+                <img src="assets/ui/level1/header-level1.png" alt="Nivel 1" class="header-image">
+            </div>
 
-        <div class="container">
-            
-            <div class="dice">
-            <div class="face front"></div>
-            <div class="face back"></div>
-            <div class="face top"></div>
-            <div class="face bottom"></div>
-            <div class="face right"></div>
-            <div class="face left"></div>
+            <!-- Main game container -->
+            <div class="game-container">
+                <!-- Dice container for level 1 -->
+                <div class="dice-container">
+                    <img src="assets/ui/level1/dice-container.png" alt="Contenedor del dado" class="container-bg">
+                    <div class="dice">
+                        <div class="face front"></div>
+                        <div class="face back"></div>
+                        <div class="face top"></div>
+                        <div class="face bottom"></div>
+                        <div class="face right"></div>
+                        <div class="face left"></div>
+                    </div>
+                    <div id="result" aria-live="polite" class="result">—</div>
+                </div>
+
+
+                <!-- Main action button -->
+                <button class="action-button">
+                    <img src="assets/ui/common/btn-girar.png" alt="Girar">
+                </button>
+
+                <!-- Cards container for operation selection -->
+                <div id="cards" class="cards"></div>
+            </div>
         </div>
-
-            <div id="result" aria-live="polite" class="result">—</div>
-
-            <div id="cards" class="cards" aria-live="polite"></div>
-
-            <button class="roll">
-                Roll Dice
-            </button>
-
-        </div>
-    </div>
 
     <!-- JS File -->
     <script src="js/script.js" type="text/javascript"></script>

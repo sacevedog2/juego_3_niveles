@@ -1,7 +1,7 @@
 const dice = document.querySelector('.dice');
-const rollBtn = document.querySelector('.roll');
+const rollBtn = document.querySelector('.action-button');
 const resultEl = document.getElementById('result');
-const scoreEl = document.getElementById('score');
+const scoreEl = document.getElementById('score-value');
 const cardsContainer = document.getElementById('cards');
 
 const randomDice = () => {
@@ -124,7 +124,7 @@ function setGameScreenLevel(level) {
 
 function updateScoreDisplay() {
     if (!scoreEl) return;
-    scoreEl.textContent = `SCORE: ${formatScoreValue(score)}`;
+    scoreEl.textContent = formatScoreValue(score);
 }
 
 // Formatea el número del score: redondea a 2 decimales y quita ceros innecesarios
@@ -144,13 +144,29 @@ function renderCards(value) {
     // Allow one selection per roll
     let selectionMade = false;
 
+    // Map operations to image files
+    const opImages = {
+        '+': 'assets/ui/level1/btn-plus.png',
+        '-': 'assets/ui/level1/btn-minus.png',
+        '×': 'assets/ui/level1/btn-times.png',
+        '÷': 'assets/ui/level1/btn-divide.png'
+    };
+
     // Render only the currently available operations
     availableOps.forEach(op => {
         const btn = document.createElement('button');
         btn.className = 'card';
         btn.type = 'button';
-    btn.textContent = op;
         btn.setAttribute('data-op', op);
+
+        // Create image instead of text
+        const img = document.createElement('img');
+        img.src = opImages[op];
+        img.alt = op;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'contain';
+        btn.appendChild(img);
 
         btn.addEventListener('click', () => {
             // Prevent multiple selections in the same roll
@@ -232,8 +248,20 @@ function startLevel2() {
     // Update visual background for level 2
     setGameScreenLevel(2);
     
-    // Ocultar el dado
-    dice.style.display = 'none';
+    // Update header image for level 2
+    const headerImg = document.querySelector('.header-image');
+    if (headerImg) {
+        headerImg.src = 'assets/ui/level2/header-level2.png';
+        headerImg.alt = 'Nivel 2';
+    }
+    
+    // Update level counter
+    const levelValue = document.getElementById('level-value');
+    if (levelValue) levelValue.textContent = '2';
+    
+    // Ocultar el dado y su contenedor
+    const diceContainer = document.querySelector('.dice-container');
+    if (diceContainer) diceContainer.style.display = 'none';
     
     // Ocultar el botón de roll dice
     rollBtn.style.display = 'none';
@@ -336,7 +364,23 @@ function renderLevel2() {
 function createPredictionButton(text, prediction) {
     const btn = document.createElement('button');
     btn.className = 'prediction-btn';
-    btn.textContent = text;
+    
+    // Map predictions to image files
+    const predictionImages = {
+        'lower': 'assets/ui/level2/btn-less.png',
+        'equal': 'assets/ui/level2/btn-equal.png',
+        'higher': 'assets/ui/level2/btn-greater.png'
+    };
+    
+    // Create image instead of text
+    const img = document.createElement('img');
+    img.src = predictionImages[prediction];
+    img.alt = text;
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'contain';
+    btn.appendChild(img);
+    
     btn.addEventListener('click', () => handlePrediction(prediction));
     return btn;
 }
@@ -474,6 +518,17 @@ function startLevel3() {
     // Update visual background for level 3
     setGameScreenLevel(3);
     
+    // Update header image for level 3
+    const headerImg = document.querySelector('.header-image');
+    if (headerImg) {
+        headerImg.src = 'assets/ui/level3/header-level3.png';
+        headerImg.alt = 'Nivel 3';
+    }
+    
+    // Update level counter
+    const levelValue = document.getElementById('level-value');
+    if (levelValue) levelValue.textContent = '3';
+    
     // Asegurar que el score mínimo sea 1 para poder apostar
     if (score < 1) {
         score = 1;
@@ -500,12 +555,29 @@ function renderLevel3() {
     const level3Container = document.createElement('div');
     level3Container.className = 'level3-container';
     
+    // Contenedor de moneda con imagen de fondo
+    const coinContainerDiv = document.createElement('div');
+    coinContainerDiv.className = 'coin-container-wrapper';
+    coinContainerDiv.style.position = 'relative';
+    coinContainerDiv.style.width = 'min(300px, 50vw)';
+    coinContainerDiv.style.height = 'auto';
+    coinContainerDiv.style.aspectRatio = '1';
+    
+    const coinContainerBg = document.createElement('img');
+    coinContainerBg.src = 'assets/ui/level3/coin-container.png';
+    coinContainerBg.style.width = '100%';
+    coinContainerBg.style.height = '100%';
+    coinContainerBg.style.objectFit = 'contain';
+    
     // Moneda (inicialmente sin mostrar resultado)
     const coinDiv = document.createElement('div');
     coinDiv.className = 'coin-display';
     coinDiv.id = 'coin';
     coinDiv.textContent = '?';
-    level3Container.appendChild(coinDiv);
+    
+    coinContainerDiv.appendChild(coinContainerBg);
+    coinContainerDiv.appendChild(coinDiv);
+    level3Container.appendChild(coinContainerDiv);
     
     // Panel de apuestas
     const betPanel = document.createElement('div');
@@ -588,13 +660,25 @@ function renderLevel3() {
     
     const caraBtn = document.createElement('button');
     caraBtn.className = 'choice-btn';
-    caraBtn.textContent = 'CARA';
     caraBtn.id = 'caraBtn';
+    const caraImg = document.createElement('img');
+    caraImg.src = 'assets/ui/level3/btn-coin-face.png';
+    caraImg.alt = 'Cara';
+    caraImg.style.width = '100%';
+    caraImg.style.height = '100%';
+    caraImg.style.objectFit = 'contain';
+    caraBtn.appendChild(caraImg);
     
     const selloBtn = document.createElement('button');
     selloBtn.className = 'choice-btn';
-    selloBtn.textContent = 'SELLO';
     selloBtn.id = 'selloBtn';
+    const selloImg = document.createElement('img');
+    selloImg.src = 'assets/ui/level3/btn-coin-tails.png';
+    selloImg.alt = 'Sello';
+    selloImg.style.width = '100%';
+    selloImg.style.height = '100%';
+    selloImg.style.objectFit = 'contain';
+    selloBtn.appendChild(selloImg);
     
     // Selección de cara/sello
     caraBtn.addEventListener('click', () => {
@@ -618,8 +702,15 @@ function renderLevel3() {
     actionButtons.className = 'action-buttons';
     
     const flipBtn = document.createElement('button');
-    flipBtn.className = 'action-btn';
-    flipBtn.textContent = isFirstFlip ? 'Lanzar Moneda' : 'Apostar';
+    flipBtn.className = 'action-btn flip-btn';
+    const flipBtnImg = document.createElement('img');
+    flipBtnImg.src = isFirstFlip ? 'assets/ui/common/btn-lanzar.png' : 'assets/ui/common/btn-apostar.png';
+    flipBtnImg.alt = isFirstFlip ? 'Lanzar' : 'Apostar';
+    flipBtnImg.style.width = '100%';
+    flipBtnImg.style.height = '100%';
+    flipBtnImg.style.objectFit = 'contain';
+    flipBtn.appendChild(flipBtnImg);
+    
     flipBtn.addEventListener('click', () => {
         if (!selectedCoin) {
             alert('Debes elegir CARA o SELLO');
@@ -641,8 +732,14 @@ function renderLevel3() {
     // Botón "Plantarse" (solo después de la primera tirada)
     if (!isFirstFlip) {
         const standBtn = document.createElement('button');
-        standBtn.className = 'action-btn secondary';
-        standBtn.textContent = 'Plantarse';
+        standBtn.className = 'action-btn secondary stand-btn';
+        const standBtnImg = document.createElement('img');
+        standBtnImg.src = 'assets/ui/common/btn-plantarse.png';
+        standBtnImg.alt = 'Plantarse';
+        standBtnImg.style.width = '100%';
+        standBtnImg.style.height = '100%';
+        standBtnImg.style.objectFit = 'contain';
+        standBtn.appendChild(standBtnImg);
         standBtn.addEventListener('click', () => {
             endLevel3();
         });

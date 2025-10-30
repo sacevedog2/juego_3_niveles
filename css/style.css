@@ -10,85 +10,282 @@
     box-sizing: border-box;
 }
 
-/* Prevent page scrolling and ensure the viewport centers the game screen */
+/* Base setup */
 html, body {
     height: 100%;
     margin: 0;
-    overflow: hidden; /* no page scroll */
+    overflow: hidden;
+    font-family: 'Montserrat', sans-serif;
 }
 
 body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #b33951; /* fallback color if background image not present */
+    background-color: #1a1a1a;
 }
 
-/* Game screen container (fixed design target 1080x1920, scales down to viewport) */
+/* Game screen - Responsive container with fixed aspect ratio */
 .game-screen {
-    /* Design target: 1080x1920 (9:16). The element will scale down to fit the
-       viewport height (no scroll). Height is capped to 100vh so page never scrolls.
-       Width is derived by the aspect-ratio and capped to 1080px. */
-    box-sizing: border-box;
-    max-width: 1080px;
-    height: min(1920px, 100vh);
-    aspect-ratio: 9 / 16;
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    max-width: calc(100vh * 9/16);
     background-size: cover;
     background-position: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 18px;
-    overflow: hidden; /* keep all game visuals inside */
+    overflow: hidden;
     box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    transform-origin: center;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
 }
 
+/* Level backgrounds */
 .game-screen.level-1 { background-image: url('../assets/Fondolevel1.png'); }
 .game-screen.level-2 { background-image: url('../assets/Fondolevel2.png'); }
 .game-screen.level-3 { background-image: url('../assets/Fondolevel3.png'); }
 
-/* Make the inner wrapper fill the game-screen so all UI stays inside the fixed box */
+/* Top counters bar */
+.counters-bar {
+    position: absolute;
+    top: min(20px, 2vh);
+    left: 0;
+    right: 0;
+    height: min(80px, 8vh);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 min(40px, 4vw);
+    z-index: 100;
+}
+
+.counter {
+    display: flex;
+    align-items: center;
+    gap: min(10px, 1vw);
+}
+
+.counter-icon {
+    width: min(80px, 10vw);
+    height: min(60px, 8vw);
+    object-fit: contain;
+}
+
+.counter-value {
+    font-size: min(24px, 3vw);
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    font-weight: bold;
+}
+
+/* Level header */
+.level-header {
+    width: 100%;
+    height: min(200px, 15vh);
+    margin-top: min(100px, 10vh); /* Space for counters */
+    padding: 0 20px;
+}
+
+.header-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    max-width: 1080px;
+    margin: 0 auto;
+    display: block;
+}
+
+/* Main wrapper */
 .game-screen .wrapper {
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    gap: 50px;
     box-sizing: border-box;
-    padding: 24px;
-    overflow: hidden; /* prevent inner content from pushing the page */
+    padding: 0;
+    overflow: hidden;
 }
 
-.container {
+/* Game container */
+.game-container {
+    width: 100%;
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 250px;
-    min-height: 300px;
-    padding: 60px 30px 40px;
-    border-radius: 30px;
-    background: #eeeeee;
-    box-shadow: 0 0 20px rgba(0, 0, 0, .1);
-    position: relative; /* permitir overlays dentro */
-    transition: all 0.3s ease;
+    gap: 20px;
+    padding: 20px;
+    overflow-y: auto;
 }
 
-/* Container expandido para niveles 2 y 3 */
-.container.wide {
-    width: 90%;
-    max-width: 700px;
-    min-height: 400px;
-    padding: 40px;
-}
-
-/* Wrapper to position the score above the container */
-.wrapper {
+/* Dice container */
+.dice-container {
+    position: relative;
+    width: min(400px, 60%);
+    height: auto;
+    aspect-ratio: 800/700;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    gap: 50px;
+    margin: 5px auto;
+}
+
+.container-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    z-index: 1;
+}
+
+/* Dice styles */
+.dice {
+    width: min(100px, 15vw);
+    height: min(100px, 15vw);
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 1.5s ease;
+    transform: translateZ(-50px) rotateY(0deg);
+    z-index: 2;
+}
+
+.face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: white;
+    border: 2px solid #999;
+    border-radius: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: min(50px, 8vw);
+    font-weight: bold;
+    backface-visibility: hidden;
+}
+
+.front  { transform: translateZ(50px); }
+.back   { transform: rotateY(180deg) translateZ(50px); }
+.right  { transform: rotateY(90deg) translateZ(50px); }
+.left   { transform: rotateY(-90deg) translateZ(50px); }
+.top    { transform: rotateX(90deg) translateZ(50px); }
+.bottom { transform: rotateX(-90deg) translateZ(50px); }
+
+/* Result text */
+#result {
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: min(36px, 5vw);
+    color: #ffffff;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    z-index: 3;
+    font-weight: bold;
+}
+
+/* Operation buttons */
+.operation-buttons {
+    display: flex;
+    gap: min(10px, 1vw);
+    margin-top: 0;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0 10px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.op-button {
+    width: min(80px, 12vw);
+    height: min(80px, 12vw);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.op-button:hover {
+    transform: scale(1.05);
+}
+
+.op-button:active {
+    transform: scale(0.95);
+}
+
+.op-button img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Main action button */
+.action-button {
+    width: min(180px, 28vw);
+    height: min(70px, 11vw);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    flex-shrink: 0;
+    display: block;
+    position: relative;
+    z-index: 10;
+}
+
+.action-button:hover {
+    transform: scale(1.05);
+}
+
+.action-button:active {
+    transform: scale(0.95);
+}
+
+.action-button img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+/* Responsive adjustments */
+@media (max-height: 700px) {
+    .game-container {
+        gap: min(20px, 2vh);
+    }
+    
+    .level-header {
+        margin-top: min(60px, 8vh);
+    }
+    
+    .counters-bar {
+        top: min(10px, 1vh);
+    }
+}
+
+/* Ensure proper scaling on wider screens */
+@media (min-aspect-ratio: 9/16) {
+    .game-screen {
+        height: 100vh;
+        width: calc(100vh * 9/16);
+    }
+}
+
+/* Result text */
+.result {
+    position: relative;
+    z-index: 2;
+    font-size: 48px;
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    margin-top: 20px;
 }
 
 /*
@@ -240,36 +437,31 @@ body {
 .cards {
     /* positioned below the container, not overlayed */
     position: relative;
-    display: flex;
+    display: none; /* Hidden by default, shown after first roll */
     gap: 12px;
     z-index: 60;
     justify-content: center;
     align-items: center;
     pointer-events: auto;
     margin-top: 20px;
+    flex-wrap: wrap;
 }
 
 .card {
-    background: rgba(255,255,255,0.98);
-    border: 2px solid #b33951;
-    padding: 12px 16px;
-    border-radius: 12px;
+    background: none;
+    border: none;
+    padding: 0;
     cursor: pointer;
-    min-width: 50px;
-    min-height: 50px;
-    text-align: center;
-    font: 900 20px 'Montserrat';
-    color: #b33951;
+    width: min(100px, 20vw);
+    height: min(100px, 20vw);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     transition: transform .12s ease, box-shadow .12s ease, opacity .16s ease;
-    box-shadow: 0 6px 18px rgba(0,0,0,.12);
 }
 
 .card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 28px rgba(0,0,0,.16);
+    transform: scale(1.05);
 }
 
 .card.disabled {
@@ -400,24 +592,17 @@ body {
 }
 
 .prediction-btn {
-    background: linear-gradient(145deg, #ffffff, #f5f5f5);
-    border: 3px solid #b33951;
-    padding: 16px 28px;
-    border-radius: 12px;
+    background: none;
+    border: none;
+    padding: 0;
     cursor: pointer;
-    min-width: 100px;
-    text-align: center;
-    font: 800 18px 'Montserrat';
-    color: #b33951;
+    width: min(120px, 22vw);
+    height: min(120px, 22vw);
     transition: all .2s ease;
-    box-shadow: 0 6px 18px rgba(0,0,0,.12);
 }
 
 .prediction-btn:hover:not(:disabled) {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 24px rgba(0,0,0,.18);
-    background: linear-gradient(145deg, #b33951, #9a2f44);
-    color: white;
+    transform: scale(1.05);
 }
 
 .prediction-btn:disabled {
@@ -517,19 +702,24 @@ body {
 }
 
 .coin-display {
-    width: 120px;
-    height: 120px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     background: linear-gradient(145deg, #ffd700, #ffed4e);
-    border: 6px solid #b8860b;
+    border: 4px solid #b8860b;
     display: flex;
     align-items: center;
     justify-content: center;
-    font: 900 32px 'Montserrat';
+    font: 900 24px 'Montserrat';
     color: #8b4513;
-    box-shadow: 0 12px 32px rgba(0,0,0,.3);
+    box-shadow: 0 8px 20px rgba(0,0,0,.3);
     transition: transform 0.6s;
     transform-style: preserve-3d;
+    z-index: 2;
 }
 
 .coin-display.flipping {
@@ -650,24 +840,17 @@ body {
 }
 
 .choice-btn {
-    background: linear-gradient(145deg, #ffffff, #f5f5f5);
-    border: 3px solid #b33951;
-    padding: 14px 24px;
-    border-radius: 10px;
+    background: none;
+    border: none;
+    padding: 0;
     cursor: pointer;
-    min-width: 90px;
-    text-align: center;
-    font: 800 16px 'Montserrat';
-    color: #b33951;
+    width: min(100px, 20vw);
+    height: min(100px, 20vw);
     transition: all .2s ease;
-    box-shadow: 0 4px 12px rgba(0,0,0,.1);
 }
 
 .choice-btn:hover:not(:disabled) {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 18px rgba(0,0,0,.15);
-    background: linear-gradient(145deg, #b33951, #9a2f44);
-    color: white;
+    transform: scale(1.05);
 }
 
 .choice-btn:disabled {
@@ -676,8 +859,8 @@ body {
 }
 
 .choice-btn.selected {
-    background: #b33951;
-    color: white;
+    transform: scale(1.1);
+    filter: brightness(1.2);
 }
 
 .action-buttons {
@@ -687,22 +870,17 @@ body {
 }
 
 .action-btn {
-    background: #b33951;
-    color: white;
+    background: none;
     border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font: 700 16px 'Montserrat';
+    padding: 0;
     cursor: pointer;
+    width: min(150px, 25vw);
+    height: min(60px, 10vw);
     transition: all .2s ease;
-    box-shadow: 0 4px 12px rgba(179, 57, 81, .3);
-    min-width: 100px;
 }
 
 .action-btn:hover:not(:disabled) {
-    background: #9a2f44;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(179, 57, 81, .4);
+    transform: scale(1.05);
 }
 
 .action-btn:disabled {
@@ -712,11 +890,7 @@ body {
 }
 
 .action-btn.secondary {
-    background: #666;
-}
-
-.action-btn.secondary:hover:not(:disabled) {
-    background: #555;
+    /* No additional styles needed for image buttons */
 }
 
 .flip-result {
