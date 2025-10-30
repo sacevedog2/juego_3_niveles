@@ -112,11 +112,16 @@ let isFirstFlip = true; // Primera tirada es obligatoria
 
 function updateScoreDisplay() {
     if (!scoreEl) return;
-    if (score === null) {
-        scoreEl.textContent = `SCORE: 0`;
-    } else {
-        scoreEl.textContent = `SCORE: ${score}`;
-    }
+    scoreEl.textContent = `SCORE: ${formatScoreValue(score)}`;
+}
+
+// Formatea el número del score: redondea a 2 decimales y quita ceros innecesarios
+function formatScoreValue(val) {
+    if (val === null || typeof val === 'undefined') return '0';
+    // Redondear a 2 decimales para evitar errores de coma flotante
+    const rounded = Math.round(Number(val) * 100) / 100;
+    // Usar toFixed y coaccionar a número para eliminar ceros finales innecesarios
+    return (+rounded.toFixed(2)).toString();
 }
 
 function renderCards(value) {
@@ -190,10 +195,15 @@ function applyOperation(op, value) {
         case '÷':
             // Avoid division by zero
             if (v === 0) break;
-            score = Math.floor(score / v);
+            // Usar división en punto flotante; no truncar para permitir decimales
+            score = score / v;
             break;
         default:
             break;
+    }
+    // Redondear el score a 2 decimales para evitar acumulación de errores flotantes
+    if (typeof score === 'number' && !Number.isNaN(score)) {
+        score = Math.round(score * 100) / 100;
     }
     // Restringir score a valores no negativos (0 o positivos)
     if (typeof score !== 'number' || Number.isNaN(score)) score = 0;
@@ -355,6 +365,8 @@ function handlePrediction(prediction) {
     // Actualizar score si acertó
     if (correct) {
         score += pointsEarned;
+        // Redondear tras sumar puntos
+        score = Math.round(score * 100) / 100;
         updateScoreDisplay();
     }
     
@@ -413,7 +425,7 @@ function endGame() {
     
     const finalScoreDiv = document.createElement('div');
     finalScoreDiv.className = 'final-score';
-    finalScoreDiv.textContent = `Puntuación: ${score}`;
+    finalScoreDiv.textContent = `Puntuación: ${formatScoreValue(score)}`;
     
     const messageDiv = document.createElement('div');
     messageDiv.style.font = '600 16px Montserrat';
@@ -445,9 +457,9 @@ function startLevel3() {
     coinFlipsRemaining = 5;
     isFirstFlip = true;
     
-    // Asegurar que el score mínimo sea 2 para poder apostar
-    if (score < 2) {
-        score = 2;
+    // Asegurar que el score mínimo sea 1 para poder apostar
+    if (score < 1) {
+        score = 1;
         updateScoreDisplay();
     }
     
@@ -488,7 +500,7 @@ function renderLevel3() {
     
     const bankDisplay = document.createElement('div');
     bankDisplay.className = 'bank-display';
-    bankDisplay.textContent = `Banco: ${score} puntos`;
+    bankDisplay.textContent = `Banco: ${formatScoreValue(score)} puntos`;
     
     const roundsInfo = document.createElement('div');
     roundsInfo.className = 'rounds-info';
@@ -507,13 +519,13 @@ function renderLevel3() {
     
     const betLabel = document.createElement('div');
     betLabel.className = 'bet-label';
-    betLabel.textContent = 'Cantidad a apostar (mín: 2)';
+    betLabel.textContent = 'Cantidad a apostar (mín: 1)';
     
     const betInput = document.createElement('input');
     betInput.type = 'number';
     betInput.className = 'bet-input';
     betInput.id = 'betAmount';
-    betInput.min = 2;
+    betInput.min = 1;
     betInput.max = score;
     betInput.value = Math.min(2, score);
     
@@ -521,14 +533,14 @@ function renderLevel3() {
     betSlider.type = 'range';
     betSlider.className = 'bet-slider';
     betSlider.id = 'betSlider';
-    betSlider.min = 2;
+    betSlider.min = 1;
     betSlider.max = score;
     betSlider.value = Math.min(2, score);
     
     // Sincronizar input y slider
     betInput.addEventListener('input', (e) => {
-        let val = parseInt(e.target.value) || 2;
-        if (val < 2) val = 2;
+        let val = parseInt(e.target.value) || 1;
+        if (val < 1) val = 1;
         if (val > score) val = score;
         betInput.value = val;
         betSlider.value = val;
@@ -541,7 +553,7 @@ function renderLevel3() {
         currentBet = val;
     });
     
-    currentBet = Math.min(2, score);
+    currentBet = Math.min(1, score);
     
     betInputGroup.appendChild(betLabel);
     betInputGroup.appendChild(betInput);
@@ -596,8 +608,8 @@ function renderLevel3() {
             alert('Debes elegir CARA o SELLO');
             return;
         }
-        if (currentBet < 2) {
-            alert('La apuesta mínima es 2 puntos');
+        if (currentBet < 1) {
+            alert('La apuesta mínima es 1 punto');
             return;
         }
         if (currentBet > score) {
@@ -660,6 +672,8 @@ function executeCoinFlip() {
         
         // Evitar score negativo
         if (score < 0) score = 0;
+        // Redondear el score y actualizar la UI
+        score = Math.round(score * 100) / 100;
         updateScoreDisplay();
         
         // Actualizar estado
@@ -691,14 +705,14 @@ function showCoinFlipResult(won, payout, result) {
     messageDiv.className = won ? 'flip-message win' : 'flip-message lose';
     
     if (won) {
-        messageDiv.textContent = `¡Ganaste! +${payout - currentBet} puntos`;
+        messageDiv.textContent = `¡Ganaste! +${formatScoreValue(payout - currentBet)} puntos`;
     } else {
-        messageDiv.textContent = `Perdiste -${currentBet} puntos`;
+        messageDiv.textContent = `Perdiste -${formatScoreValue(currentBet)} puntos`;
     }
     
     const bankDiv = document.createElement('div');
     bankDiv.className = 'bank-display';
-    bankDiv.textContent = `Banco actual: ${score} puntos`;
+    bankDiv.textContent = `Banco actual: ${formatScoreValue(score)} puntos`;
     
     resultDiv.appendChild(coinDiv);
     resultDiv.appendChild(messageDiv);
@@ -709,7 +723,7 @@ function showCoinFlipResult(won, payout, result) {
     continueBtn.className = 'continue-btn';
     
     // Decidir qué mostrar según el estado
-    if (score < 2) {
+    if (score < 1) {
         // No puede seguir apostando
         continueBtn.textContent = 'Finalizar Juego';
         continueBtn.addEventListener('click', () => endLevel3());
@@ -745,7 +759,7 @@ function endLevel3() {
     
     const finalScoreDiv = document.createElement('div');
     finalScoreDiv.className = 'final-score';
-    finalScoreDiv.textContent = `Puntuación Final: ${score} puntos`;
+    finalScoreDiv.textContent = `Puntuación Final: ${formatScoreValue(score)} puntos`;
     
     const messageDiv = document.createElement('div');
     messageDiv.style.font = '600 16px Montserrat';
