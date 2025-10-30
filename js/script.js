@@ -17,9 +17,11 @@ const rollDice = random => {
     // Al iniciar el rodado ocultamos las tarjetas (no se pueden usar durante el movimiento)
     if (cardsContainer) cardsContainer.style.display = 'none';
 
-    dice.style.animation = 'rolling 4s';
+    dice.style.animation = 'rolling 2s ease-out';
 
     setTimeout(() => {
+        dice.style.animation = 'none';
+        
         switch (random) {
             case 1:
                 dice.style.transform = 'rotateX(0deg) rotateY(0deg)';
@@ -47,8 +49,6 @@ const rollDice = random => {
             if (resultEl) {
                 resultEl.textContent = random;
             }
-
-            dice.style.animation = 'none';
 
             // Si hay una operación pendiente (elegida en la tirada anterior), aplicarla
             if (pendingOp !== null) {
@@ -81,7 +81,7 @@ const rollDice = random => {
         rollBtn.disabled = false;
         rollBtn.style.opacity = '';
 
-    }, 4050);
+    }, 2050);
 
 }
 
