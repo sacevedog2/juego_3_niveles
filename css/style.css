@@ -497,8 +497,8 @@ body {
 
 .card-flip-container {
     perspective: 1000px;
-    width: min(160px, 32vw);
-    height: min(200px, 40vw);
+    width: min(200px, 38vw);
+    height: min(250px, 48vw);
 }
 
 .card-flipper {
@@ -534,19 +534,19 @@ body {
 }
 
 .card-back .card-number {
-    font: 900 min(60px, 10vw) 'Montserrat';
+    font: 900 min(80px, 14vw) 'Montserrat';
     color: #333;
     text-shadow: 0 2px 4px rgba(255,255,255,0.8);
 }
 
 .current-card {
     /* Background set via JS: card-front.png */
-    width: min(160px, 32vw);
-    height: min(200px, 40vw);
+    width: min(200px, 38vw);
+    height: min(250px, 48vw);
     display: flex;
     align-items: center;
     justify-content: center;
-    font: 900 min(60px, 10vw) 'Montserrat';
+    font: 900 min(80px, 14vw) 'Montserrat';
     color: #333;
     text-align: center;
     text-shadow: 0 2px 4px rgba(255,255,255,0.8);
@@ -611,8 +611,8 @@ body {
 
 .result-card {
     /* Background set via JS: card-front.png */
-    width: min(160px, 32vw);
-    height: min(200px, 40vw);
+    width: min(200px, 38vw);
+    height: min(250px, 48vw);
     display: flex;
     align-items: center;
     justify-content: center;

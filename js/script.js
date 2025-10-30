@@ -498,7 +498,7 @@ function showPredictionResult(nextCard, correct, points) {
     cardNumber.textContent = nextCard;
     cardNumber.style.position = 'relative';
     cardNumber.style.zIndex = '2';
-    cardNumber.style.font = '900 min(60px, 10vw) Montserrat';
+    cardNumber.style.font = '900 min(80px, 14vw) Montserrat';
     cardNumber.style.color = '#333';
     cardNumber.style.textShadow = '0 2px 4px rgba(255,255,255,0.8)';
     cardDiv.appendChild(cardNumber);
