@@ -497,8 +497,8 @@ body {
 
 .card-flip-container {
     perspective: 1000px;
-    width: min(120px, 25vw);
-    height: min(150px, 32vw);
+    width: min(160px, 32vw);
+    height: min(200px, 40vw);
 }
 
 .card-flipper {
@@ -534,19 +534,19 @@ body {
 }
 
 .card-back .card-number {
-    font: 900 min(48px, 8vw) 'Montserrat';
+    font: 900 min(60px, 10vw) 'Montserrat';
     color: #333;
     text-shadow: 0 2px 4px rgba(255,255,255,0.8);
 }
 
 .current-card {
     /* Background set via JS: card-front.png */
-    width: min(120px, 25vw);
-    height: min(150px, 32vw);
+    width: min(160px, 32vw);
+    height: min(200px, 40vw);
     display: flex;
     align-items: center;
     justify-content: center;
-    font: 900 min(48px, 8vw) 'Montserrat';
+    font: 900 min(60px, 10vw) 'Montserrat';
     color: #333;
     text-align: center;
     text-shadow: 0 2px 4px rgba(255,255,255,0.8);
@@ -574,9 +574,10 @@ body {
 
 .predictions {
     display: flex;
-    gap: min(10px, 2vw);
+    gap: min(12px, 2vw);
     justify-content: center;
-    flex-wrap: wrap;
+    align-items: center;
+    flex-wrap: nowrap;
     margin-top: 10px;
     width: 100%;
 }
@@ -586,9 +587,10 @@ body {
     border: none;
     padding: 0;
     cursor: pointer;
-    width: min(120px, 22vw);
-    height: min(120px, 22vw);
+    width: min(90px, 18vw);
+    height: min(90px, 18vw);
     transition: all .2s ease;
+    flex-shrink: 0;
 }
 
 .prediction-btn:hover:not(:disabled) {
@@ -609,8 +611,8 @@ body {
 
 .result-card {
     /* Background set via JS: card-front.png */
-    width: min(140px, 30vw);
-    height: min(175px, 38vw);
+    width: min(160px, 32vw);
+    height: min(200px, 40vw);
     display: flex;
     align-items: center;
     justify-content: center;
