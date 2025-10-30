@@ -110,6 +110,18 @@ let currentBet = 0;
 let selectedCoin = null; // 'cara' o 'sello'
 let isFirstFlip = true; // Primera tirada es obligatoria
 
+// UI helper: update .game-screen level class to change background per level
+function setGameScreenLevel(level) {
+    try {
+        const gs = document.querySelector('.game-screen');
+        if (!gs) return;
+        gs.classList.remove('level-1','level-2','level-3');
+        gs.classList.add(`level-${level}`);
+    } catch (e) {
+        // noop — this is purely visual
+    }
+}
+
 function updateScoreDisplay() {
     if (!scoreEl) return;
     scoreEl.textContent = `SCORE: ${formatScoreValue(score)}`;
@@ -217,6 +229,8 @@ function startLevel2() {
     gameLevel = 2;
     level2Started = true;
     roundsRemaining = 10;
+    // Update visual background for level 2
+    setGameScreenLevel(2);
     
     // Ocultar el dado
     dice.style.display = 'none';
@@ -456,6 +470,9 @@ function startLevel3() {
     level3Started = true;
     coinFlipsRemaining = 5;
     isFirstFlip = true;
+
+    // Update visual background for level 3
+    setGameScreenLevel(3);
     
     // Asegurar que el score mínimo sea 1 para poder apostar
     if (score < 1) {

@@ -10,12 +10,55 @@
     box-sizing: border-box;
 }
 
+/* Prevent page scrolling and ensure the viewport centers the game screen */
+html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden; /* no page scroll */
+}
+
 body {
-    height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #b33951;
+    background-color: #b33951; /* fallback color if background image not present */
+}
+
+/* Game screen container (fixed design target 1080x1920, scales down to viewport) */
+.game-screen {
+    /* Design target: 1080x1920 (9:16). The element will scale down to fit the
+       viewport height (no scroll). Height is capped to 100vh so page never scrolls.
+       Width is derived by the aspect-ratio and capped to 1080px. */
+    box-sizing: border-box;
+    max-width: 1080px;
+    height: min(1920px, 100vh);
+    aspect-ratio: 9 / 16;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    overflow: hidden; /* keep all game visuals inside */
+    box-shadow: 0 20px 60px rgba(0,0,0,.45);
+}
+
+.game-screen.level-1 { background-image: url('../assets/Fondolevel1.png'); }
+.game-screen.level-2 { background-image: url('../assets/Fondolevel2.png'); }
+.game-screen.level-3 { background-image: url('../assets/Fondolevel3.png'); }
+
+/* Make the inner wrapper fill the game-screen so all UI stays inside the fixed box */
+.game-screen .wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 50px;
+    box-sizing: border-box;
+    padding: 24px;
+    overflow: hidden; /* prevent inner content from pushing the page */
 }
 
 .container {
@@ -66,6 +109,22 @@ body {
     }
 }
 
+.roll {
+    cursor: pointer;
+    color: #b33951;
+    margin-top: 60px;
+    padding: 6px 12px;
+    border-radius: 3px;
+    font: 700 16px 'Montserrat';
+    border: 2px solid #b33951;
+    transition: .4s;
+}
+
+.roll:hover {
+    color: #fff;
+    background: #b33951;
+}
+
 .face {
     position: absolute;
     width: 100%;
@@ -73,9 +132,7 @@ body {
     border-radius: 20px;
     border: 5px solid #f6f3f0;
     transform-style: preserve-3d;
-    background: linear-gradient(
-        145deg, #dddbd8, #fff
-    );
+    background: linear-gradient(145deg, #dddbd8, #fff);
 }
 
 .face::before {
@@ -97,6 +154,7 @@ body {
     height: 18px;
     border-radius: 50%;
     background: #131210;
+    transform: translateZ(2px); /* bring pip in front so it's clearly visible */
 }
 
 .front {
@@ -165,25 +223,7 @@ body {
                 50px 50px;
 }
 
-/*
-    Roll Button styles
-*/
-
-.roll {
-    cursor: pointer;
-    color: #b33951;
-    margin-top: 60px;
-    padding: 6px 12px;
-    border-radius: 3px;
-    font: 700 16px 'Montserrat';
-    border: 2px solid #b33951;
-    transition: .4s;
-}
-
-.roll:hover {
-    color: #fff;
-    background: #b33951;
-}
+/* Roll button original styles removed in favor of scaled .roll styles above */
 
 /* Score */
 .score {
