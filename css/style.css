@@ -115,21 +115,22 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
-    padding: 20px;
-    overflow-y: auto;
+    gap: 15px;
+    padding: 15px;
+    overflow: hidden;
 }
 
 /* Dice container */
 .dice-container {
     position: relative;
-    width: min(400px, 60%);
+    width: min(300px, 50%);
     height: auto;
     aspect-ratio: 800/700;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 5px auto;
+    margin: 0 auto;
+    flex-shrink: 0;
 }
 
 .container-bg {
@@ -200,13 +201,14 @@ body {
 }
 
 .op-button {
-    width: min(80px, 12vw);
-    height: min(80px, 12vw);
+    width: min(70px, 15vw);
+    height: min(70px, 15vw);
     background: none;
     border: none;
     padding: 0;
     cursor: pointer;
     transition: transform 0.2s ease;
+    flex-shrink: 0;
 }
 
 .op-button:hover {
@@ -439,14 +441,15 @@ body {
     position: relative;
     display: none; /* Hidden by default, shown after first roll */
     flex-direction: row;
-    gap: 15px;
+    gap: 10px;
     z-index: 60;
     justify-content: center;
     align-items: center;
     pointer-events: auto;
-    margin-top: 20px;
-    flex-wrap: wrap;
+    margin-top: 10px;
+    flex-wrap: nowrap;
     width: 100%;
+    overflow: visible;
 }
 
 .card {
@@ -454,12 +457,13 @@ body {
     border: none;
     padding: 0;
     cursor: pointer;
-    width: min(100px, 20vw);
-    height: min(100px, 20vw);
+    width: min(70px, 15vw);
+    height: min(70px, 15vw);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     transition: transform .12s ease, box-shadow .12s ease, opacity .16s ease;
+    flex-shrink: 0;
 }
 
 .card:hover {
@@ -479,20 +483,22 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 15px;
+    gap: 12px;
     width: 100%;
     max-width: 100%;
     padding: 10px;
     box-sizing: border-box;
+    overflow: hidden;
 }
 
 .cards-row {
     display: flex;
-    gap: min(30px, 5vw);
+    gap: min(25px, 4vw);
     align-items: center;
     justify-content: center;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     width: 100%;
+    flex-shrink: 0;
 }
 
 .card-flip-container {
