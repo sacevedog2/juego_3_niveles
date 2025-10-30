@@ -137,11 +137,7 @@ function formatScoreValue(val) {
 }
 
 function renderCards(value) {
-    console.log('renderCards llamado, cardsContainer:', cardsContainer);
-    if (!cardsContainer) {
-        console.error('cardsContainer no encontrado!');
-        return;
-    }
+    if (!cardsContainer) return;
     // Clear existing cards
     cardsContainer.innerHTML = '';
 
@@ -155,8 +151,6 @@ function renderCards(value) {
         '×': 'assets/ui/level1/btn-times.png',
         '÷': 'assets/ui/level1/btn-divide.png'
     };
-
-    console.log('Operaciones disponibles:', availableOps);
 
     // Render only the currently available operations
     availableOps.forEach(op => {
@@ -173,8 +167,6 @@ function renderCards(value) {
         img.style.height = '100%';
         img.style.objectFit = 'contain';
         btn.appendChild(img);
-
-        console.log('Botón creado para operación:', op);
 
         btn.addEventListener('click', () => {
             // Prevent multiple selections in the same roll
@@ -204,9 +196,6 @@ function renderCards(value) {
 
         cardsContainer.appendChild(btn);
     });
-
-    console.log('Total de botones agregados:', cardsContainer.children.length);
-    console.log('Display del cardsContainer:', cardsContainer.style.display);
 
     // If no operations left, show a small message
     if (availableOps.length === 0) {
