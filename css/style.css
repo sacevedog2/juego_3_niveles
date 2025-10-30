@@ -84,7 +84,7 @@ body {
 }
 
 .coins-counter .counter-value {
-    left: 55%;
+    margin-left: 5px;
 }
 
 /* Level header */
