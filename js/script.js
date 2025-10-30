@@ -307,7 +307,7 @@ function renderLevel2() {
     roundsDiv.textContent = `Rondas restantes: ${roundsRemaining}`;
     level2Layout.appendChild(roundsDiv);
     
-    // Fila de cartas (carta actual + contenido central + tarjeta volteada)
+    // Fila de cartas (solo las dos cartas lado a lado)
     const cardsRow = document.createElement('div');
     cardsRow.className = 'cards-row';
     
@@ -328,17 +328,6 @@ function renderLevel2() {
     currentCardDiv.appendChild(currentCardNumber);
     
     cardsRow.appendChild(currentCardDiv);
-    
-    // Contenido central (instrucción)
-    const centerContent = document.createElement('div');
-    centerContent.className = 'center-content';
-    
-    const instructionDiv = document.createElement('div');
-    instructionDiv.className = 'instruction';
-    instructionDiv.textContent = `¿La siguiente carta será?`;
-    centerContent.appendChild(instructionDiv);
-    
-    cardsRow.appendChild(centerContent);
     
     // Tarjeta volteada (derecha) - próxima carta
     const cardFlipContainer = document.createElement('div');
@@ -378,6 +367,12 @@ function renderLevel2() {
     cardsRow.appendChild(cardFlipContainer);
     
     level2Layout.appendChild(cardsRow);
+    
+    // Instrucción debajo de las cartas
+    const instructionDiv = document.createElement('div');
+    instructionDiv.className = 'instruction';
+    instructionDiv.textContent = `¿La siguiente carta será?`;
+    level2Layout.appendChild(instructionDiv);
     
     // Crear botones de predicción (abajo)
     const predictionsDiv = document.createElement('div');

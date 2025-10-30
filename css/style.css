@@ -488,13 +488,11 @@ body {
 
 .cards-row {
     display: flex;
-    gap: min(20px, 3vw);
+    gap: min(30px, 5vw);
     align-items: center;
     justify-content: center;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
+    margin-bottom: 15px;
     width: 100%;
-    max-width: 100%;
 }
 
 .card-flip-container {
@@ -554,23 +552,15 @@ body {
     text-shadow: 0 2px 4px rgba(255,255,255,0.8);
 }
 
-.center-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    flex-shrink: 1;
-}
-
 .instruction {
-    font: 600 min(14px, 2.5vw) 'Montserrat';
+    font: 600 min(16px, 3vw) 'Montserrat';
     color: #333;
     text-align: center;
     background: rgba(255,255,255,0.9);
-    padding: 8px 12px;
-    border-radius: 8px;
+    padding: 10px 20px;
+    border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0,0,0,.1);
-    white-space: nowrap;
+    margin-bottom: 10px;
 }
 
 .rounds-counter {
