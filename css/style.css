@@ -438,13 +438,15 @@ body {
     /* positioned below the container, not overlayed */
     position: relative;
     display: none; /* Hidden by default, shown after first roll */
-    gap: 12px;
+    flex-direction: row;
+    gap: 15px;
     z-index: 60;
     justify-content: center;
     align-items: center;
     pointer-events: auto;
     margin-top: 20px;
     flex-wrap: wrap;
+    width: 100%;
 }
 
 .card {

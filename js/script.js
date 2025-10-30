@@ -56,7 +56,7 @@ const rollDice = random => {
                 pendingOp = null;
                 // Después de aplicar la operación, si aún hay operaciones disponibles, mostrar tarjetas
                 if (availableOps.length > 0) {
-                    if (cardsContainer) cardsContainer.style.display = '';
+                    if (cardsContainer) cardsContainer.style.display = 'flex';
                     renderCards(random);
                 } else {
                     // No quedan operaciones, iniciar nivel 2
@@ -72,7 +72,7 @@ const rollDice = random => {
                 }
                 // Mostrar tarjetas para elegir la operación que se aplicará con la siguiente tirada
                 if (availableOps.length > 0) {
-                    if (cardsContainer) cardsContainer.style.display = '';
+                    if (cardsContainer) cardsContainer.style.display = 'flex';
                     renderCards(random);
                 }
             }
@@ -284,7 +284,7 @@ function renderLevel2() {
     if (!cardsContainer) return;
     
     cardsContainer.innerHTML = '';
-    cardsContainer.style.display = '';
+    cardsContainer.style.display = 'flex';
     
     // Contenedor principal del nivel 2
     const level2Layout = document.createElement('div');
@@ -550,7 +550,7 @@ function renderLevel3() {
     if (!cardsContainer) return;
     
     cardsContainer.innerHTML = '';
-    cardsContainer.style.display = '';
+    cardsContainer.style.display = 'flex';
     
     const level3Container = document.createElement('div');
     level3Container.className = 'level3-container';
