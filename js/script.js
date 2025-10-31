@@ -451,13 +451,21 @@ function handlePrediction(prediction) {
         pointsEarned = 3;
     }
     
-    // Actualizar score si acertó
+    // Actualizar score
     if (correct) {
         score += pointsEarned;
-        // Redondear tras sumar puntos
-        score = Math.round(score * 100) / 100;
-        updateScoreDisplay();
+    } else {
+        // Restar 1 punto si es incorrecto
+        score -= 1;
+        pointsEarned = -1; // Para mostrar la imagen incorrect-1.png
     }
+    
+    // Evitar score negativo
+    if (score < 0) score = 0;
+    
+    // Redondear tras sumar/restar puntos
+    score = Math.round(score * 100) / 100;
+    updateScoreDisplay();
     
     // Esperar a que termine la animación de volteo
     setTimeout(() => {
@@ -506,8 +514,54 @@ function showPredictionResult(nextCard, correct, points) {
     cardDiv.appendChild(cardNumber);
     
     const messageDiv = document.createElement('div');
-    messageDiv.className = correct ? 'result-message correct' : 'result-message incorrect';
-    messageDiv.textContent = correct ? `¡Correcto! +${points} punto${points > 1 ? 's' : ''}` : '¡Incorrecto!';
+    // Determinar qué clase usar según el resultado
+    let resultClass = 'result-message';
+    if (correct) {
+        resultClass = 'result-message correct';
+    } else {
+        resultClass = 'result-message incorrect';
+    }
+    messageDiv.className = resultClass;
+    messageDiv.style.position = 'relative';
+    
+    const messageImg = document.createElement('img');
+    // Usar las imágenes correct.png o incorrect.png
+    if (correct) {
+        messageImg.src = 'assets/ui/common/correct.png';
+        messageImg.alt = '¡Correcto!';
+    } else {
+        messageImg.src = 'assets/ui/common/incorrect.png';
+        messageImg.alt = '¡Incorrecto!';
+    }
+    messageImg.style.width = '100%';
+    messageImg.style.height = '100%';
+    messageImg.style.objectFit = 'contain';
+    messageDiv.appendChild(messageImg);
+    
+    // Crear animación numérica
+    const pointsText = document.createElement('div');
+    pointsText.className = 'points-animation';
+    // Mostrar el signo y número
+    if (correct) {
+        pointsText.textContent = `+${points}`;
+        pointsText.classList.add('points-positive');
+    } else {
+        pointsText.textContent = `-1`;
+        pointsText.classList.add('points-negative');
+    }
+    messageDiv.appendChild(pointsText);
+    
+    // Iniciar animación después de un pequeño delay
+    setTimeout(() => {
+        pointsText.classList.add('animate');
+    }, 100);
+    
+    // Eliminar el elemento después de la animación
+    setTimeout(() => {
+        if (pointsText.parentNode) {
+            pointsText.parentNode.removeChild(pointsText);
+        }
+    }, 2000);
     
     resultDiv.appendChild(cardDiv);
     resultDiv.appendChild(messageDiv);
@@ -609,7 +663,7 @@ function renderLevel3() {
     flipsRemainingDiv.className = 'flips-remaining-indicator';
     flipsRemainingDiv.textContent = `Lanzamientos: ${coinFlipsRemaining}/5`;
     if (isFirstFlip) {
-        flipsRemainingDiv.textContent += ' (Obligatorio)';
+        flipsRemainingDiv.textContent += ' ';
     }
     level3Container.appendChild(flipsRemainingDiv);
     
@@ -868,16 +922,79 @@ function showCoinFlipResult(won, payout, result) {
     
     const messageDiv = document.createElement('div');
     messageDiv.className = won ? 'flip-message win' : 'flip-message lose';
+    messageDiv.style.position = 'relative';
+    messageDiv.style.width = '200px';
+    messageDiv.style.height = '220px';
+    messageDiv.style.display = 'flex';
+    messageDiv.style.alignItems = 'center';
+    messageDiv.style.justifyContent = 'center';
+    messageDiv.style.padding = '0';
+    messageDiv.style.borderRadius = '0';
+    messageDiv.style.background = 'none';
+    messageDiv.style.border = 'none';
+    messageDiv.style.boxShadow = 'none';
     
+    // Usar las imágenes correct.png o incorrect.png
+    const messageImg = document.createElement('img');
     if (won) {
-        messageDiv.textContent = `¡Ganaste! +${formatScoreValue(payout - currentBet)} puntos`;
+        messageImg.src = 'assets/ui/common/correct.png';
+        messageImg.alt = '¡Correcto!';
     } else {
-        messageDiv.textContent = `Perdiste -${formatScoreValue(currentBet)} puntos`;
+        messageImg.src = 'assets/ui/common/incorrect.png';
+        messageImg.alt = '¡Incorrecto!';
     }
+    messageImg.style.width = '100%';
+    messageImg.style.height = '100%';
+    messageImg.style.objectFit = 'contain';
+    messageDiv.appendChild(messageImg);
+    
+    // Crear animación numérica
+    const pointsText = document.createElement('div');
+    pointsText.className = 'points-animation';
+    // Calcular puntos ganados/perdidos
+    if (won) {
+        const pointsGained = payout - currentBet; // Ganancia neta
+        pointsText.textContent = `+${formatScoreValue(pointsGained)}`;
+        pointsText.classList.add('points-positive');
+    } else {
+        pointsText.textContent = `-${formatScoreValue(currentBet)}`;
+        pointsText.classList.add('points-negative');
+    }
+    messageDiv.appendChild(pointsText);
+    
+    // Iniciar animación después de un pequeño delay
+    setTimeout(() => {
+        pointsText.classList.add('animate');
+    }, 100);
+    
+    // Eliminar el elemento después de la animación
+    setTimeout(() => {
+        if (pointsText.parentNode) {
+            pointsText.parentNode.removeChild(pointsText);
+        }
+    }, 2000);
     
     const bankDiv = document.createElement('div');
     bankDiv.className = 'bank-display';
-    bankDiv.textContent = `Banco actual: ${formatScoreValue(score)} puntos`;
+    bankDiv.style.display = 'flex';
+    bankDiv.style.alignItems = 'center';
+    bankDiv.style.justifyContent = 'center';
+    bankDiv.style.gap = '8px';
+    
+    const coinsImg = document.createElement('img');
+    coinsImg.src = 'assets/ui/level3/coins.png';
+    coinsImg.alt = 'Monedas';
+    coinsImg.style.width = '40px';
+    coinsImg.style.height = '40px';
+    coinsImg.style.objectFit = 'contain';
+    
+    const coinsValue = document.createElement('span');
+    coinsValue.textContent = formatScoreValue(score);
+    coinsValue.style.font = '700 18px Montserrat';
+    coinsValue.style.color = '#333';
+    
+    bankDiv.appendChild(coinsImg);
+    bankDiv.appendChild(coinsValue);
     
     resultDiv.appendChild(coinImg);
     resultDiv.appendChild(messageDiv);

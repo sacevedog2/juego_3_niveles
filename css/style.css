@@ -94,7 +94,7 @@ body {
     min-height: min(120px, 12vh);
     max-height: min(180px, 15vh);
     margin-top: min(100px, 10vh); /* Space for counters */
-    padding: 0 20px;
+    padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -103,10 +103,10 @@ body {
 .header-image {
     width: 100%;
     height: auto;
-    object-fit: contain;
-    max-width: 1080px;
+    object-fit: cover;
+    max-width: 100%;
     max-height: min(180px, 15vh);
-    margin: 0 auto;
+    margin: 0;
     display: block;
 }
 
@@ -659,22 +659,95 @@ body {
 }
 
 .result-message {
-    font: 700 20px 'Montserrat';
-    padding: 12px 24px;
-    border-radius: 10px;
-    text-align: center;
+    width: 200px;
+    height: 220px;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.result-message img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .result-message.correct {
-    background: #4caf50;
-    color: white;
-    box-shadow: 0 4px 12px rgba(76, 175, 80, .3);
+    background: none;
+    color: transparent;
+    box-shadow: none;
 }
 
 .result-message.incorrect {
-    background: #f44336;
-    color: white;
-    box-shadow: 0 4px 12px rgba(244, 67, 54, .3);
+    background: none;
+    color: transparent;
+    box-shadow: none;
+}
+
+/* Points animation - Raid Rush style */
+.points-animation {
+    position: absolute;
+    bottom: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(0);
+    font: 900 48px 'Montserrat';
+    text-align: center;
+    pointer-events: none;
+    z-index: 10;
+    opacity: 0;
+    transition: none;
+}
+
+.points-animation.animate {
+    animation: pointsFloatUp 1.8s ease-out forwards;
+}
+
+.points-positive {
+    color: #4ade80;
+    text-shadow: 
+        0 0 10px rgba(74, 222, 128, 0.8),
+        0 0 20px rgba(74, 222, 128, 0.6),
+        0 0 30px rgba(74, 222, 128, 0.4),
+        0 2px 4px rgba(0, 0, 0, 0.5),
+        0 4px 8px rgba(0, 0, 0, 0.3);
+    filter: drop-shadow(0 0 8px rgba(74, 222, 128, 0.9));
+}
+
+.points-negative {
+    color: #f87171;
+    text-shadow: 
+        0 0 10px rgba(248, 113, 113, 0.8),
+        0 0 20px rgba(248, 113, 113, 0.6),
+        0 0 30px rgba(248, 113, 113, 0.4),
+        0 2px 4px rgba(0, 0, 0, 0.5),
+        0 4px 8px rgba(0, 0, 0, 0.3);
+    filter: drop-shadow(0 0 8px rgba(248, 113, 113, 0.9));
+}
+
+@keyframes pointsFloatUp {
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(0px) scale(0.8);
+    }
+    15% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-10px) scale(1.1);
+    }
+    30% {
+        transform: translateX(-50%) translateY(-20px) scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-40px) scale(1.05);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-120px) scale(0.9);
+    }
 }
 
 .game-end {
@@ -744,18 +817,22 @@ body {
 }
 
 .flips-remaining-indicator {
-    font: 700 min(11px, 2vw) 'Montserrat';
+    font: 700 min(12px, 2.2vw) 'Montserrat';
     color: #ffffff;
     text-align: center;
-    background: rgba(179, 57, 81, 0.9);
-    padding: 3px 8px;
+    background: #c9e5ff;
+    padding: 10px 10px 6px 10px;
     border-radius: 5px;
     margin-bottom: 0px;
-    margin-top: -8px;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    margin-top: 5px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     white-space: nowrap;
     max-width: 95%;
+    line-height: 1.6;
+    overflow: visible;
+    display: inline-block;
+    vertical-align: middle;
 }
 
 /* Moneda como imagen */
@@ -820,12 +897,16 @@ body {
 
 .bank-display {
     font: 700 16px 'Montserrat';
-    color: #333;
+    color: #fafafa;
     text-align: center;
-    background: linear-gradient(145deg, #f0f0f0, #ffffff);
-    padding: 8px 14px;
-    border-radius: 8px;
-    border: 2px solid #b33951;
+    background: none;
+    padding: 0;
+    border-radius: 0;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .bet-input-group {
@@ -961,8 +1042,8 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
-    padding: 20px;
+    gap: 6px;
+    padding: 10px;
 }
 
 .flip-message {
@@ -982,6 +1063,13 @@ body {
     background: #f44336;
     color: white;
     box-shadow: 0 6px 16px rgba(244, 67, 54, .3);
+}
+
+/* Override for image messages in level 3 */
+.flip-message img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .continue-btn {
