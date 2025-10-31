@@ -1073,19 +1073,28 @@ body {
 }
 
 .continue-btn {
-    background: #4caf50;
-    color: white;
+    background: none;
+    color: transparent;
     border: none;
-    padding: 12px 28px;
-    border-radius: 10px;
-    font: 700 16px 'Montserrat';
+    padding: 0;
+    border-radius: 0;
+    font: none;
     cursor: pointer;
-    transition: all .2s ease;
-    box-shadow: 0 4px 12px rgba(76, 175, 80, .3);
+    transition: transform .2s ease;
+    box-shadow: none;
+    min-width: 160px;
+    min-height: 44px;
 }
 
 .continue-btn:hover {
-    background: #45a049;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(76, 175, 80, .4);
+    background: none;
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: none;
+}
+
+.continue-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
 }

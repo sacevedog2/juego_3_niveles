@@ -991,7 +991,7 @@ function showCoinFlipResult(won, payout, result) {
     const coinsValue = document.createElement('span');
     coinsValue.textContent = formatScoreValue(score);
     coinsValue.style.font = '700 18px Montserrat';
-    coinsValue.style.color = '#333';
+    coinsValue.style.color = '#ffffff';
     
     bankDiv.appendChild(coinsImg);
     bankDiv.appendChild(coinsValue);
@@ -1003,19 +1003,29 @@ function showCoinFlipResult(won, payout, result) {
     // Botón para continuar
     const continueBtn = document.createElement('button');
     continueBtn.className = 'continue-btn';
+    continueBtn.style.background = 'none';
+    continueBtn.style.border = 'none';
+    continueBtn.style.padding = '0';
+    continueBtn.style.cursor = 'pointer';
     
-    // Decidir qué mostrar según el estado
+    const continueImg = document.createElement('img');
+    continueImg.src = 'assets/ui/common/continue.png';
+    continueImg.alt = 'Continuar';
+    continueImg.style.width = '100%';
+    continueImg.style.height = '100%';
+    continueImg.style.objectFit = 'contain';
+    continueImg.style.display = 'block';
+    continueBtn.appendChild(continueImg);
+    
+    // Decidir qué hacer según el estado
     if (score < 1) {
         // No puede seguir apostando
-        continueBtn.textContent = 'Finalizar Juego';
         continueBtn.addEventListener('click', () => endLevel3());
     } else if (coinFlipsRemaining <= 0) {
         // Sin rondas restantes
-        continueBtn.textContent = 'Finalizar Nivel 3';
         continueBtn.addEventListener('click', () => endLevel3());
     } else {
         // Puede continuar
-        continueBtn.textContent = 'Continuar';
         continueBtn.addEventListener('click', () => {
             // Reset selección y volver a mostrar imagen inicial
             selectedCoin = null;
