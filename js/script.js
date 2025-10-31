@@ -17,6 +17,11 @@ const rollDice = random => {
 
     // Al iniciar el rodado ocultamos las tarjetas (no se pueden usar durante el movimiento)
     if (cardsContainer) cardsContainer.style.display = 'none';
+    
+    // Limpiar el display de operaciones durante la animación
+    if (operationsDisplay) {
+        operationsDisplay.textContent = 'Girando...';
+    }
 
     dice.style.animation = 'rolling 2s ease-out';
 
@@ -750,10 +755,23 @@ function renderLevel3() {
     const betInputGroup = document.createElement('div');
     betInputGroup.className = 'bet-input-group';
     
-    const betLabel = document.createElement('img');
+    // Crear contenedor para el título
+    const betLabel = document.createElement('div');
     betLabel.className = 'bet-label';
-    betLabel.src = 'assets/ui/common/title-cant.png';
-    betLabel.alt = 'Cantidad a apostar';
+    betLabel.style.position = 'relative';
+    betLabel.style.width = '100%';
+    betLabel.style.display = 'flex';
+    betLabel.style.alignItems = 'center';
+    betLabel.style.justifyContent = 'center';
+    
+    // Título "CANTIDAD"
+    const titleText = document.createElement('span');
+    titleText.textContent = 'CANTIDAD';
+    titleText.style.font = '700 14px Montserrat';
+    titleText.style.color = '#ffffff';
+    titleText.style.textAlign = 'center';
+    
+    betLabel.appendChild(titleText);
     
     const betInput = document.createElement('input');
     betInput.type = 'number';

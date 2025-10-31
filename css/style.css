@@ -912,17 +912,18 @@ body {
 .bet-input-group {
     display: flex;
     flex-direction: column;
-    gap: 1px;
+    gap: 6px;
     margin-bottom: 1px;
+    margin-top: 8px;
 }
 
 .bet-label {
-    width: auto;
-    max-width: 80%;
+    width: 100%;
     height: auto;
-    object-fit: contain;
-    margin: 0 auto;
+    min-height: 24px;
+    margin: 0 0 4px 0;
     display: block;
+    position: relative;
 }
 
 .bet-input {
@@ -952,6 +953,7 @@ body {
     background-size: 100% 100%;
     outline: none;
     -webkit-appearance: none;
+    margin-top: 4px;
 }
 
 .bet-slider::-webkit-slider-thumb {
@@ -979,8 +981,8 @@ body {
     display: flex;
     gap: 6px;
     justify-content: center;
-    margin-bottom: 1px;
-    margin-top: -8px;
+    margin-bottom: 0px;
+    margin-top: -15px;
 }
 
 .choice-btn {
@@ -1011,7 +1013,7 @@ body {
     display: flex;
     gap: 8px;
     justify-content: center;
-    margin-top: 0px;
+    margin-top: 6px;
 }
 
 .action-btn {
