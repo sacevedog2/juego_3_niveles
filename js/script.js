@@ -3,6 +3,7 @@ const rollBtn = document.querySelector('.action-button');
 const resultEl = document.getElementById('result');
 const scoreEl = document.getElementById('score-value');
 const cardsContainer = document.getElementById('cards');
+const operationsDisplay = document.getElementById('operations-display');
 
 const randomDice = () => {
     // Genera un número entero entre 1 y 6 (inclusive)
@@ -52,7 +53,12 @@ const rollDice = random => {
 
             // Si hay una operación pendiente (elegida en la tirada anterior), aplicarla
             if (pendingOp !== null) {
+                const previousScore = score;
                 applyOperation(pendingOp, random);
+                // Update operations display with the calculation
+                if (operationsDisplay) {
+                    operationsDisplay.textContent = `${formatScoreValue(previousScore)} ${pendingOp} ${random} = ${formatScoreValue(score)}`;
+                }
                 pendingOp = null;
                 // Después de aplicar la operación, si aún hay operaciones disponibles, mostrar tarjetas
                 if (availableOps.length > 0) {
@@ -69,6 +75,10 @@ const rollDice = random => {
                 if (score === null) {
                     score = random;
                     updateScoreDisplay();
+                    // Show initial value
+                    if (operationsDisplay) {
+                        operationsDisplay.textContent = `Valor inicial: ${random}`;
+                    }
                 }
                 // Mostrar tarjetas para elegir la operación que se aplicará con la siguiente tirada
                 if (availableOps.length > 0) {
@@ -262,6 +272,9 @@ function startLevel2() {
     // Ocultar el dado y su contenedor
     const diceContainer = document.querySelector('.dice-container');
     if (diceContainer) diceContainer.style.display = 'none';
+    
+    // Ocultar el display de operaciones
+    if (operationsDisplay) operationsDisplay.style.display = 'none';
     
     // Ocultar el botón de roll dice
     rollBtn.style.display = 'none';
@@ -624,8 +637,8 @@ function renderLevel3() {
     coinDiv.className = 'coin-image';
     coinDiv.id = 'coin';
     coinDiv.src = 'assets/ui/level3/inicial-coin.png';
-    coinDiv.style.width = '70%';
-    coinDiv.style.height = '70%';
+    coinDiv.style.width = '60%';
+    coinDiv.style.height = '60%';
     coinDiv.style.objectFit = 'contain';
     coinDiv.style.zIndex = '2';
     coinDiv.style.position = 'relative';
@@ -633,55 +646,6 @@ function renderLevel3() {
     coinContainerDiv.appendChild(coinContainerBg);
     coinContainerDiv.appendChild(coinDiv);
     level3Container.appendChild(coinContainerDiv);
-    
-    // Controles sin panel contenedor (sin cuadro blanco)
-    
-    // Input de apuesta
-    const betInputGroup = document.createElement('div');
-    betInputGroup.className = 'bet-input-group';
-    
-    const betLabel = document.createElement('div');
-    betLabel.className = 'bet-label';
-    betLabel.textContent = 'Cantidad a apostar (mín: 1)';
-    
-    const betInput = document.createElement('input');
-    betInput.type = 'number';
-    betInput.className = 'bet-input';
-    betInput.id = 'betAmount';
-    betInput.min = 1;
-    betInput.max = score;
-    betInput.value = Math.min(2, score);
-    
-    const betSlider = document.createElement('input');
-    betSlider.type = 'range';
-    betSlider.className = 'bet-slider';
-    betSlider.id = 'betSlider';
-    betSlider.min = 1;
-    betSlider.max = score;
-    betSlider.value = Math.min(2, score);
-    
-    // Sincronizar input y slider
-    betInput.addEventListener('input', (e) => {
-        let val = parseInt(e.target.value) || 1;
-        if (val < 1) val = 1;
-        if (val > score) val = score;
-        betInput.value = val;
-        betSlider.value = val;
-        currentBet = val;
-    });
-    
-    betSlider.addEventListener('input', (e) => {
-        const val = parseInt(e.target.value);
-        betInput.value = val;
-        currentBet = val;
-    });
-    
-    currentBet = Math.min(1, score);
-    
-    betInputGroup.appendChild(betLabel);
-    betInputGroup.appendChild(betInput);
-    betInputGroup.appendChild(betSlider);
-    level3Container.appendChild(betInputGroup);
     
     // Elección: Cara o Sello (sin título)
     const choiceButtons = document.createElement('div');
@@ -725,6 +689,56 @@ function renderLevel3() {
     choiceButtons.appendChild(caraBtn);
     choiceButtons.appendChild(selloBtn);
     level3Container.appendChild(choiceButtons);
+    
+    // Controles sin panel contenedor (sin cuadro blanco)
+    
+    // Input de apuesta
+    const betInputGroup = document.createElement('div');
+    betInputGroup.className = 'bet-input-group';
+    
+    const betLabel = document.createElement('img');
+    betLabel.className = 'bet-label';
+    betLabel.src = 'assets/ui/common/title-cant.png';
+    betLabel.alt = 'Cantidad a apostar';
+    
+    const betInput = document.createElement('input');
+    betInput.type = 'number';
+    betInput.className = 'bet-input';
+    betInput.id = 'betAmount';
+    betInput.min = 1;
+    betInput.max = score;
+    betInput.value = Math.min(2, score);
+    
+    const betSlider = document.createElement('input');
+    betSlider.type = 'range';
+    betSlider.className = 'bet-slider';
+    betSlider.id = 'betSlider';
+    betSlider.min = 1;
+    betSlider.max = score;
+    betSlider.value = Math.min(2, score);
+    
+    // Sincronizar input y slider
+    betInput.addEventListener('input', (e) => {
+        let val = parseInt(e.target.value) || 1;
+        if (val < 1) val = 1;
+        if (val > score) val = score;
+        betInput.value = val;
+        betSlider.value = val;
+        currentBet = val;
+    });
+    
+    betSlider.addEventListener('input', (e) => {
+        const val = parseInt(e.target.value);
+        betInput.value = val;
+        currentBet = val;
+    });
+    
+    currentBet = Math.min(1, score);
+    
+    betInputGroup.appendChild(betLabel);
+    betInputGroup.appendChild(betInput);
+    betInputGroup.appendChild(betSlider);
+    level3Container.appendChild(betInputGroup);
     
     // Botones de acción
     const actionButtons = document.createElement('div');
