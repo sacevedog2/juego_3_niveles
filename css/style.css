@@ -748,6 +748,15 @@ body {
     padding: 20px;
 }
 
+.game-end-final {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    width: 100%;
+}
+
 .end-title {
     font: 900 32px 'Montserrat';
     color: #b33951;
@@ -762,6 +771,15 @@ body {
     border-radius: 15px;
     border: 3px solid #b33951;
     box-shadow: 0 8px 20px rgba(0,0,0,.15);
+}
+
+.final-score-background {
+    position: relative;
+}
+
+.final-score-value {
+    position: relative;
+    z-index: 2;
 }
 
 .restart-btn {
@@ -780,6 +798,25 @@ body {
     background: #9a2f44;
     transform: translateY(-2px);
     box-shadow: 0 10px 24px rgba(179, 57, 81, .4);
+}
+
+.restart-btn-final {
+    background: #d0b9d9;
+    color: white;
+    border: 6px solid white;
+    padding: 14px 32px;
+    border-radius: 30px;
+    font: 900 min(18px, 3.5vw) 'Montserrat';
+    cursor: pointer;
+    transition: all .2s ease;
+    box-shadow: 0 6px 18px rgba(208, 185, 217, .3);
+    min-width: min(200px, 40vw);
+}
+
+.restart-btn-final:hover {
+    background: #c4a9d0;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(208, 185, 217, .4);
 }
 
 /* ========== LEVEL 3: Coin Flip Betting Styles ========== */

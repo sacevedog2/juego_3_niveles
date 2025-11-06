@@ -582,36 +582,9 @@ function showPredictionResult(nextCard, correct, points) {
 function endGame() {
     if (!cardsContainer) return;
     
+    // Pasar directamente al nivel 3 sin mostrar resumen
     cardsContainer.innerHTML = '';
-    
-    const endDiv = document.createElement('div');
-    endDiv.className = 'game-end';
-    
-    const titleDiv = document.createElement('div');
-    titleDiv.className = 'end-title';
-    titleDiv.textContent = '¡Nivel 2 Completado!';
-    
-    const finalScoreDiv = document.createElement('div');
-    finalScoreDiv.className = 'final-score';
-    finalScoreDiv.textContent = `Puntuación: ${formatScoreValue(score)}`;
-    
-    const messageDiv = document.createElement('div');
-    messageDiv.style.font = '600 16px Montserrat';
-    messageDiv.style.color = '#666';
-    messageDiv.style.textAlign = 'center';
-    messageDiv.style.marginTop = '10px';
-    messageDiv.textContent = 'Preparándote para el nivel final...';
-    
-    endDiv.appendChild(titleDiv);
-    endDiv.appendChild(finalScoreDiv);
-    endDiv.appendChild(messageDiv);
-    
-    cardsContainer.appendChild(endDiv);
-    
-    // Ir automáticamente al nivel 3 después de 2 segundos
-    setTimeout(() => {
-        startLevel3();
-    }, 2000);
+    startLevel3();
 }
 
 // Initialize display
@@ -1064,43 +1037,71 @@ function showCoinFlipResult(won, payout, result) {
 function endLevel3() {
     if (!cardsContainer) return;
     
+    // Cambiar el fondo del game-screen a la imagen de puntuación
+    const gameScreen = document.querySelector('.game-screen');
+    if (gameScreen) {
+        gameScreen.style.backgroundImage = 'url(assets/puntuacionf.png)';
+        gameScreen.style.backgroundSize = 'cover';
+        gameScreen.style.backgroundPosition = 'center';
+        gameScreen.style.backgroundRepeat = 'no-repeat';
+    }
+    
+    // Ocultar los contadores superiores
+    const countersBar = document.querySelector('.counters-bar');
+    if (countersBar) {
+        countersBar.style.display = 'none';
+    }
+    
+    // Ocultar el header del nivel
+    const levelHeader = document.querySelector('.level-header');
+    if (levelHeader) {
+        levelHeader.style.display = 'none';
+    }
+    
     cardsContainer.innerHTML = '';
     
     const endDiv = document.createElement('div');
-    endDiv.className = 'game-end';
+    endDiv.className = 'game-end-final';
     
-    const titleDiv = document.createElement('div');
-    titleDiv.className = 'end-title';
-    titleDiv.textContent = '¡Juego Completado!';
-    
+    // Solo mostrar los puntos (ajusta la posición según tu diseño de imagen)
     const finalScoreDiv = document.createElement('div');
-    finalScoreDiv.className = 'final-score';
-    finalScoreDiv.textContent = `Puntuación Final: ${formatScoreValue(score)} puntos`;
+    finalScoreDiv.className = 'final-score-value';
+    finalScoreDiv.textContent = formatScoreValue(score);
+    finalScoreDiv.style.font = '900 min(120px, 20vw) Montserrat';
+    finalScoreDiv.style.color = '#ffffff';
+    finalScoreDiv.style.textShadow = '4px 4px 8px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.5)';
+    finalScoreDiv.style.textAlign = 'center';
+    finalScoreDiv.style.position = 'relative';
+    finalScoreDiv.style.zIndex = '10';
+    finalScoreDiv.style.fontWeight = '900';
+    finalScoreDiv.style.letterSpacing = '2px';
+    // Text stroke para hacerlo más bold
+    finalScoreDiv.style.webkitTextStroke = '3px rgba(0,0,0,0.3)';
+    finalScoreDiv.style.textStroke = '3px rgba(0,0,0,0.3)';
+    // Ajusta estos valores según donde quieras que aparezcan los puntos en tu imagen
+    // Puedes cambiar marginTop para desplazar verticalmente
+    finalScoreDiv.style.marginTop = 'min(300px, 40vh)';
+    finalScoreDiv.style.marginBottom = '20px';
     
-    const messageDiv = document.createElement('div');
-    messageDiv.style.font = '600 16px Montserrat';
-    messageDiv.style.color = '#666';
-    messageDiv.style.textAlign = 'center';
-    messageDiv.style.marginTop = '10px';
+    endDiv.appendChild(finalScoreDiv);
     
-    if (score >= 50) {
-        messageDiv.textContent = 'Eres un maestro del azar';
-    } else if (score >= 20) {
-        messageDiv.textContent = '¡Bien hecho! Gran puntuación';
-    } else if (score >= 10) {
-        messageDiv.textContent = 'Buen intento, sigue practicando';
-    } else {
-        messageDiv.textContent = 'La suerte no estuvo de tu lado hoy';
-    }
-    
+    // Botón de jugar de nuevo
     const restartBtn = document.createElement('button');
-    restartBtn.className = 'restart-btn';
+    restartBtn.className = 'restart-btn-final';
     restartBtn.textContent = 'Jugar de Nuevo';
     restartBtn.addEventListener('click', () => location.reload());
+    restartBtn.style.marginTop = '20px';
+    restartBtn.style.position = 'relative';
+    restartBtn.style.zIndex = '10';
+    restartBtn.style.background = '#d0b9d9';
+    restartBtn.style.borderRadius = '30px';
+    restartBtn.style.fontWeight = '900';
+    restartBtn.style.border = '6px solid white';
+    restartBtn.style.padding = '14px 32px';
+    restartBtn.style.cursor = 'pointer';
+    restartBtn.style.transition = 'all .2s ease';
+    restartBtn.style.boxShadow = '0 6px 18px rgba(208, 185, 217, .3)';
     
-    endDiv.appendChild(titleDiv);
-    endDiv.appendChild(finalScoreDiv);
-    endDiv.appendChild(messageDiv);
     endDiv.appendChild(restartBtn);
     
     cardsContainer.appendChild(endDiv);
