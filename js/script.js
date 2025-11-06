@@ -15,19 +15,23 @@ const rollDice = random => {
     rollBtn.disabled = true;
     rollBtn.style.opacity = '0.6';
 
-    // Al iniciar el rodado ocultamos las tarjetas (no se pueden usar durante el movimiento)
+    // Ocultar tarjetas mientras el dado gira
     if (cardsContainer) cardsContainer.style.display = 'none';
     
-    // Limpiar el display de operaciones durante la animación
+    // Mostrar mensaje de "Girando..."
     if (operationsDisplay) {
         operationsDisplay.textContent = 'Girando...';
     }
 
-    dice.style.animation = 'rolling 2s ease-out';
+    // 🔹 Duración variable: si sale 1, el dado para más rápido
+    const duration = random === 1 ? 1 : 2; // segundos
+    dice.style.animation = `rolling ${duration}s ease-out`;
 
+    // Esperar a que termine la animación antes de mostrar el resultado
     setTimeout(() => {
         dice.style.animation = 'none';
         
+        // 🔹 Aplicar la rotación final según el número obtenido
         switch (random) {
             case 1:
                 dice.style.transform = 'rotateX(0deg) rotateY(0deg)';
@@ -51,54 +55,56 @@ const rollDice = random => {
                 break;
         }
 
-            // Actualizar resultado visible
-            if (resultEl) {
-                resultEl.textContent = random;
+        // Mostrar número en pantalla
+        if (resultEl) {
+            resultEl.textContent = random;
+        }
+
+        // --- Lógica del puntaje y operaciones ---
+        if (pendingOp !== null) {
+            const previousScore = score;
+            applyOperation(pendingOp, random);
+            
+            if (operationsDisplay) {
+                operationsDisplay.textContent = `${formatScoreValue(previousScore)} ${pendingOp} ${random} = ${formatScoreValue(score)}`;
             }
 
-            // Si hay una operación pendiente (elegida en la tirada anterior), aplicarla
-            if (pendingOp !== null) {
-                const previousScore = score;
-                applyOperation(pendingOp, random);
-                // Update operations display with the calculation
-                if (operationsDisplay) {
-                    operationsDisplay.textContent = `${formatScoreValue(previousScore)} ${pendingOp} ${random} = ${formatScoreValue(score)}`;
-                }
-                pendingOp = null;
-                // Después de aplicar la operación, si aún hay operaciones disponibles, mostrar tarjetas
-                if (availableOps.length > 0) {
-                    if (cardsContainer) cardsContainer.style.display = 'flex';
-                    renderCards(random);
-                } else {
-                    // No quedan operaciones, iniciar nivel 2
-                    setTimeout(() => {
-                        startLevel2();
-                    }, 1000);
-                }
+            pendingOp = null;
+
+            if (availableOps.length > 0) {
+                if (cardsContainer) cardsContainer.style.display = 'flex';
+                renderCards(random);
+                rollBtn.disabled = true;
+                rollBtn.style.opacity = '0.6';
             } else {
-                // Si es la primera tirada, inicializamos el score con este valor
-                if (score === null) {
-                    score = random;
-                    updateScoreDisplay();
-                    // Show initial value
-                    if (operationsDisplay) {
-                        operationsDisplay.textContent = `Valor inicial: ${random}`;
-                    }
-                }
-                // Mostrar tarjetas para elegir la operación que se aplicará con la siguiente tirada
-                if (availableOps.length > 0) {
-                    if (cardsContainer) cardsContainer.style.display = 'flex';
-                    renderCards(random);
+                setTimeout(() => {
+                    startLevel2();
+                }, 1000);
+            }
+
+        } else {
+            // Si es la primera tirada
+            if (score === null) {
+                score = random;
+                updateScoreDisplay();
+
+                if (operationsDisplay) {
+                    operationsDisplay.textContent = `Valor inicial: ${random}`;
                 }
             }
 
-        // Reactivar botón
-        rollBtn.disabled = false;
-        rollBtn.style.opacity = '';
+            // Mostrar tarjetas para elegir la operación siguiente
+            if (availableOps.length > 0) {
+                if (cardsContainer) cardsContainer.style.display = 'flex';
+                renderCards(random);
+                rollBtn.disabled = true;
+                rollBtn.style.opacity = '0.6';
+            }
+        }
 
-    }, 2050);
-
-}
+        // No reactivar botón automáticamente — se activa al seleccionar operación o pasar de nivel
+    }, (duration * 1000) + 50); // 🔹 Ajuste dinámico del tiempo de espera
+};
 
 rollBtn.addEventListener('click', () => {
     const n = randomDice();

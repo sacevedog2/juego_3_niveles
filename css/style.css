@@ -178,10 +178,11 @@ body {
     height: min(100px, 15vw);
     position: relative;
     transform-style: preserve-3d;
-    transition: transform 1.5s ease;
-    transform: translateZ(-50px) rotateY(0deg);
+    transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+    transform: translateZ(-50px);
     z-index: 2;
-}
+  }
+  
 
 .face {
     position: absolute;
@@ -321,17 +322,6 @@ body {
     margin-top: 20px;
 }
 
-/*
-    Dice Styles
-*/
-
-.dice {
-    position: relative;
-    width: 100px;
-    height: 100px;
-    transform-style: preserve-3d;
-    transition: none;
-}
 
 @keyframes rolling {
     0% {
