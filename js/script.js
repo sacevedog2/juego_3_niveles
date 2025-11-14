@@ -1,8 +1,9 @@
 const dice = document.querySelector('.dice');
-const rollBtn = document.querySelector('.roll');
+const rollBtn = document.querySelector('.action-button');
 const resultEl = document.getElementById('result');
-const scoreEl = document.getElementById('score');
+const scoreEl = document.getElementById('score-value');
 const cardsContainer = document.getElementById('cards');
+const operationsDisplay = document.getElementById('operations-display');
 
 const randomDice = () => {
     // Genera un número entero entre 1 y 6 (inclusive)
@@ -14,12 +15,23 @@ const rollDice = random => {
     rollBtn.disabled = true;
     rollBtn.style.opacity = '0.6';
 
-    // Al iniciar el rodado ocultamos las tarjetas (no se pueden usar durante el movimiento)
+    // Ocultar tarjetas mientras el dado gira
     if (cardsContainer) cardsContainer.style.display = 'none';
+    
+    // Mostrar mensaje de "Girando..."
+    if (operationsDisplay) {
+        operationsDisplay.textContent = 'Girando...';
+    }
 
-    dice.style.animation = 'rolling 4s';
+    // 🔹 Duración variable: si sale 1, el dado para más rápido
+    const duration = random === 1 ? 1 : 2; // segundos
+    dice.style.animation = `rolling ${duration}s ease-out`;
 
+    // Esperar a que termine la animación antes de mostrar el resultado
     setTimeout(() => {
+        dice.style.animation = 'none';
+        
+        // 🔹 Aplicar la rotación final según el número obtenido
         switch (random) {
             case 1:
                 dice.style.transform = 'rotateX(0deg) rotateY(0deg)';
@@ -43,47 +55,56 @@ const rollDice = random => {
                 break;
         }
 
-            // Actualizar resultado visible
-            if (resultEl) {
-                resultEl.textContent = random;
+        // Mostrar número en pantalla
+        if (resultEl) {
+            resultEl.textContent = random;
+        }
+
+        // --- Lógica del puntaje y operaciones ---
+        if (pendingOp !== null) {
+            const previousScore = score;
+            applyOperation(pendingOp, random);
+            
+            if (operationsDisplay) {
+                operationsDisplay.textContent = `${formatScoreValue(previousScore)} ${pendingOp} ${random} = ${formatScoreValue(score)}`;
             }
 
-            dice.style.animation = 'none';
+            pendingOp = null;
 
-            // Si hay una operación pendiente (elegida en la tirada anterior), aplicarla
-            if (pendingOp !== null) {
-                applyOperation(pendingOp, random);
-                pendingOp = null;
-                // Después de aplicar la operación, si aún hay operaciones disponibles, mostrar tarjetas
-                if (availableOps.length > 0) {
-                    if (cardsContainer) cardsContainer.style.display = '';
-                    renderCards(random);
-                } else {
-                    // No quedan operaciones, iniciar nivel 2
-                    setTimeout(() => {
-                        startLevel2();
-                    }, 1000);
-                }
+            if (availableOps.length > 0) {
+                if (cardsContainer) cardsContainer.style.display = 'flex';
+                renderCards(random);
+                rollBtn.disabled = true;
+                rollBtn.style.opacity = '0.6';
             } else {
-                // Si es la primera tirada, inicializamos el score con este valor
-                if (score === null) {
-                    score = random;
-                    updateScoreDisplay();
-                }
-                // Mostrar tarjetas para elegir la operación que se aplicará con la siguiente tirada
-                if (availableOps.length > 0) {
-                    if (cardsContainer) cardsContainer.style.display = '';
-                    renderCards(random);
+                setTimeout(() => {
+                    startLevel2();
+                }, 1000);
+            }
+
+        } else {
+            // Si es la primera tirada
+            if (score === null) {
+                score = random;
+                updateScoreDisplay();
+
+                if (operationsDisplay) {
+                    operationsDisplay.textContent = `Valor inicial: ${random}`;
                 }
             }
 
-        // Reactivar botón
-        rollBtn.disabled = false;
-        rollBtn.style.opacity = '';
+            // Mostrar tarjetas para elegir la operación siguiente
+            if (availableOps.length > 0) {
+                if (cardsContainer) cardsContainer.style.display = 'flex';
+                renderCards(random);
+                rollBtn.disabled = true;
+                rollBtn.style.opacity = '0.6';
+            }
+        }
 
-    }, 4050);
-
-}
+        // No reactivar botón automáticamente — se activa al seleccionar operación o pasar de nivel
+    }, (duration * 1000) + 50); // 🔹 Ajuste dinámico del tiempo de espera
+};
 
 rollBtn.addEventListener('click', () => {
     const n = randomDice();
@@ -124,7 +145,7 @@ function setGameScreenLevel(level) {
 
 function updateScoreDisplay() {
     if (!scoreEl) return;
-    scoreEl.textContent = `SCORE: ${formatScoreValue(score)}`;
+    scoreEl.textContent = formatScoreValue(score);
 }
 
 // Formatea el número del score: redondea a 2 decimales y quita ceros innecesarios
@@ -144,13 +165,29 @@ function renderCards(value) {
     // Allow one selection per roll
     let selectionMade = false;
 
+    // Map operations to image files
+    const opImages = {
+        '+': 'assets/ui/level1/btn-plus.png',
+        '-': 'assets/ui/level1/btn-minus.png',
+        '×': 'assets/ui/level1/btn-times.png',
+        '÷': 'assets/ui/level1/btn-divide.png'
+    };
+
     // Render only the currently available operations
     availableOps.forEach(op => {
         const btn = document.createElement('button');
         btn.className = 'card';
         btn.type = 'button';
-    btn.textContent = op;
         btn.setAttribute('data-op', op);
+
+        // Create image instead of text
+        const img = document.createElement('img');
+        img.src = opImages[op];
+        img.alt = op;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'contain';
+        btn.appendChild(img);
 
         btn.addEventListener('click', () => {
             // Prevent multiple selections in the same roll
@@ -232,8 +269,23 @@ function startLevel2() {
     // Update visual background for level 2
     setGameScreenLevel(2);
     
-    // Ocultar el dado
-    dice.style.display = 'none';
+    // Update header image for level 2
+    const headerImg = document.querySelector('.header-image');
+    if (headerImg) {
+        headerImg.src = 'assets/ui/level2/header-level2.png';
+        headerImg.alt = 'Nivel 2';
+    }
+    
+    // Update level counter
+    const levelValue = document.getElementById('level-value');
+    if (levelValue) levelValue.textContent = '2';
+    
+    // Ocultar el dado y su contenedor
+    const diceContainer = document.querySelector('.dice-container');
+    if (diceContainer) diceContainer.style.display = 'none';
+    
+    // Ocultar el display de operaciones
+    if (operationsDisplay) operationsDisplay.style.display = 'none';
     
     // Ocultar el botón de roll dice
     rollBtn.style.display = 'none';
@@ -256,7 +308,7 @@ function renderLevel2() {
     if (!cardsContainer) return;
     
     cardsContainer.innerHTML = '';
-    cardsContainer.style.display = '';
+    cardsContainer.style.display = 'flex';
     
     // Contenedor principal del nivel 2
     const level2Layout = document.createElement('div');
@@ -268,26 +320,27 @@ function renderLevel2() {
     roundsDiv.textContent = `Rondas restantes: ${roundsRemaining}`;
     level2Layout.appendChild(roundsDiv);
     
-    // Fila de cartas (carta actual + contenido central + tarjeta volteada)
+    // Fila de cartas (solo las dos cartas lado a lado)
     const cardsRow = document.createElement('div');
     cardsRow.className = 'cards-row';
     
-    // Carta actual (izquierda)
+    // Carta actual (izquierda) - usa card-front.png de fondo
     const currentCardDiv = document.createElement('div');
     currentCardDiv.className = 'current-card';
-    currentCardDiv.textContent = currentCard;
+    currentCardDiv.style.position = 'relative';
+    currentCardDiv.style.backgroundImage = 'url(assets/ui/level2/card-front.png)';
+    currentCardDiv.style.backgroundSize = 'contain';
+    currentCardDiv.style.backgroundRepeat = 'no-repeat';
+    currentCardDiv.style.backgroundPosition = 'center';
+    
+    // Número de la carta encima de la imagen
+    const currentCardNumber = document.createElement('div');
+    currentCardNumber.textContent = currentCard;
+    currentCardNumber.style.position = 'relative';
+    currentCardNumber.style.zIndex = '2';
+    currentCardDiv.appendChild(currentCardNumber);
+    
     cardsRow.appendChild(currentCardDiv);
-    
-    // Contenido central (instrucción)
-    const centerContent = document.createElement('div');
-    centerContent.className = 'center-content';
-    
-    const instructionDiv = document.createElement('div');
-    instructionDiv.className = 'instruction';
-    instructionDiv.textContent = `¿La siguiente carta será?`;
-    centerContent.appendChild(instructionDiv);
-    
-    cardsRow.appendChild(centerContent);
     
     // Tarjeta volteada (derecha) - próxima carta
     const cardFlipContainer = document.createElement('div');
@@ -297,17 +350,28 @@ function renderLevel2() {
     cardFlipper.className = 'card-flipper';
     cardFlipper.id = 'nextCardFlipper';
     
-    // Cara frontal (reverso de la carta - oculta el número)
+    // Cara frontal (reverso de la carta - card-back.png con ?)
     const cardFront = document.createElement('div');
     cardFront.className = 'card-front';
+    cardFront.style.backgroundImage = 'url(assets/ui/level2/card-back.png)';
+    cardFront.style.backgroundSize = 'contain';
+    cardFront.style.backgroundRepeat = 'no-repeat';
+    cardFront.style.backgroundPosition = 'center';
     
-    // Cara trasera (muestra el número)
+    // Cara trasera (card-front.png con el número)
     const cardBack = document.createElement('div');
     cardBack.className = 'card-back';
+    cardBack.style.backgroundImage = 'url(assets/ui/level2/card-front.png)';
+    cardBack.style.backgroundSize = 'contain';
+    cardBack.style.backgroundRepeat = 'no-repeat';
+    cardBack.style.backgroundPosition = 'center';
+    
     const cardNumber = document.createElement('div');
     cardNumber.className = 'card-number';
     cardNumber.id = 'nextCardNumber';
     cardNumber.textContent = '?';
+    cardNumber.style.position = 'relative';
+    cardNumber.style.zIndex = '2';
     cardBack.appendChild(cardNumber);
     
     cardFlipper.appendChild(cardFront);
@@ -316,6 +380,12 @@ function renderLevel2() {
     cardsRow.appendChild(cardFlipContainer);
     
     level2Layout.appendChild(cardsRow);
+    
+    // Instrucción debajo de las cartas
+    const instructionDiv = document.createElement('div');
+    instructionDiv.className = 'instruction';
+    instructionDiv.textContent = `¿La siguiente carta será?`;
+    level2Layout.appendChild(instructionDiv);
     
     // Crear botones de predicción (abajo)
     const predictionsDiv = document.createElement('div');
@@ -336,7 +406,23 @@ function renderLevel2() {
 function createPredictionButton(text, prediction) {
     const btn = document.createElement('button');
     btn.className = 'prediction-btn';
-    btn.textContent = text;
+    
+    // Map predictions to image files
+    const predictionImages = {
+        'lower': 'assets/ui/level2/btn-less.png',
+        'equal': 'assets/ui/level2/btn-equal.png',
+        'higher': 'assets/ui/level2/btn-greater.png'
+    };
+    
+    // Create image instead of text
+    const img = document.createElement('img');
+    img.src = predictionImages[prediction];
+    img.alt = text;
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'contain';
+    btn.appendChild(img);
+    
     btn.addEventListener('click', () => handlePrediction(prediction));
     return btn;
 }
@@ -376,13 +462,21 @@ function handlePrediction(prediction) {
         pointsEarned = 3;
     }
     
-    // Actualizar score si acertó
+    // Actualizar score
     if (correct) {
         score += pointsEarned;
-        // Redondear tras sumar puntos
-        score = Math.round(score * 100) / 100;
-        updateScoreDisplay();
+    } else {
+        // Restar 1 punto si es incorrecto
+        score -= 1;
+        pointsEarned = -1; // Para mostrar la imagen incorrect-1.png
     }
+    
+    // Evitar score negativo
+    if (score < 0) score = 0;
+    
+    // Redondear tras sumar/restar puntos
+    score = Math.round(score * 100) / 100;
+    updateScoreDisplay();
     
     // Esperar a que termine la animación de volteo
     setTimeout(() => {
@@ -412,13 +506,73 @@ function showPredictionResult(nextCard, correct, points) {
     const resultDiv = document.createElement('div');
     resultDiv.className = 'prediction-result';
     
+    // Carta con el resultado usando card-front.png
     const cardDiv = document.createElement('div');
     cardDiv.className = 'result-card';
-    cardDiv.textContent = nextCard;
+    cardDiv.style.backgroundImage = 'url(assets/ui/level2/card-front.png)';
+    cardDiv.style.backgroundSize = 'contain';
+    cardDiv.style.backgroundRepeat = 'no-repeat';
+    cardDiv.style.backgroundPosition = 'center';
+    cardDiv.style.position = 'relative';
+    
+    const cardNumber = document.createElement('div');
+    cardNumber.textContent = nextCard;
+    cardNumber.style.position = 'relative';
+    cardNumber.style.zIndex = '2';
+    cardNumber.style.font = '900 min(80px, 14vw) Montserrat';
+    cardNumber.style.color = '#333';
+    cardNumber.style.textShadow = '0 2px 4px rgba(255,255,255,0.8)';
+    cardDiv.appendChild(cardNumber);
     
     const messageDiv = document.createElement('div');
-    messageDiv.className = correct ? 'result-message correct' : 'result-message incorrect';
-    messageDiv.textContent = correct ? `¡Correcto! +${points} punto${points > 1 ? 's' : ''}` : '¡Incorrecto!';
+    // Determinar qué clase usar según el resultado
+    let resultClass = 'result-message';
+    if (correct) {
+        resultClass = 'result-message correct';
+    } else {
+        resultClass = 'result-message incorrect';
+    }
+    messageDiv.className = resultClass;
+    messageDiv.style.position = 'relative';
+    
+    const messageImg = document.createElement('img');
+    // Usar las imágenes correct.png o incorrect.png
+    if (correct) {
+        messageImg.src = 'assets/ui/common/correct.png';
+        messageImg.alt = '¡Correcto!';
+    } else {
+        messageImg.src = 'assets/ui/common/incorrect.png';
+        messageImg.alt = '¡Incorrecto!';
+    }
+    messageImg.style.width = '100%';
+    messageImg.style.height = '100%';
+    messageImg.style.objectFit = 'contain';
+    messageDiv.appendChild(messageImg);
+    
+    // Crear animación numérica
+    const pointsText = document.createElement('div');
+    pointsText.className = 'points-animation';
+    // Mostrar el signo y número
+    if (correct) {
+        pointsText.textContent = `+${points}`;
+        pointsText.classList.add('points-positive');
+    } else {
+        pointsText.textContent = `-1`;
+        pointsText.classList.add('points-negative');
+    }
+    messageDiv.appendChild(pointsText);
+    
+    // Iniciar animación después de un pequeño delay
+    setTimeout(() => {
+        pointsText.classList.add('animate');
+    }, 100);
+    
+    // Eliminar el elemento después de la animación
+    setTimeout(() => {
+        if (pointsText.parentNode) {
+            pointsText.parentNode.removeChild(pointsText);
+        }
+    }, 2000);
     
     resultDiv.appendChild(cardDiv);
     resultDiv.appendChild(messageDiv);
@@ -428,36 +582,9 @@ function showPredictionResult(nextCard, correct, points) {
 function endGame() {
     if (!cardsContainer) return;
     
+    // Pasar directamente al nivel 3 sin mostrar resumen
     cardsContainer.innerHTML = '';
-    
-    const endDiv = document.createElement('div');
-    endDiv.className = 'game-end';
-    
-    const titleDiv = document.createElement('div');
-    titleDiv.className = 'end-title';
-    titleDiv.textContent = '¡Nivel 2 Completado!';
-    
-    const finalScoreDiv = document.createElement('div');
-    finalScoreDiv.className = 'final-score';
-    finalScoreDiv.textContent = `Puntuación: ${formatScoreValue(score)}`;
-    
-    const messageDiv = document.createElement('div');
-    messageDiv.style.font = '600 16px Montserrat';
-    messageDiv.style.color = '#666';
-    messageDiv.style.textAlign = 'center';
-    messageDiv.style.marginTop = '10px';
-    messageDiv.textContent = 'Preparándote para el nivel final...';
-    
-    endDiv.appendChild(titleDiv);
-    endDiv.appendChild(finalScoreDiv);
-    endDiv.appendChild(messageDiv);
-    
-    cardsContainer.appendChild(endDiv);
-    
-    // Ir automáticamente al nivel 3 después de 2 segundos
-    setTimeout(() => {
-        startLevel3();
-    }, 2000);
+    startLevel3();
 }
 
 // Initialize display
@@ -474,11 +601,26 @@ function startLevel3() {
     // Update visual background for level 3
     setGameScreenLevel(3);
     
+    // Update header image for level 3
+    const headerImg = document.querySelector('.header-image');
+    if (headerImg) {
+        headerImg.src = 'assets/ui/level3/header-level3.png';
+        headerImg.alt = 'Nivel 3';
+    }
+    
+    // Update level counter
+    const levelValue = document.getElementById('level-value');
+    if (levelValue) levelValue.textContent = '3';
+    
     // Asegurar que el score mínimo sea 1 para poder apostar
     if (score < 1) {
         score = 1;
         updateScoreDisplay();
     }
+    
+    // Actualizar el contador de coins con el score actual
+    const coinsValue = document.getElementById('coins-value');
+    if (coinsValue) coinsValue.textContent = formatScoreValue(score);
     
     // Ocultar elementos de nivel 2
     if (resultEl) resultEl.style.display = 'none';
@@ -495,48 +637,120 @@ function renderLevel3() {
     if (!cardsContainer) return;
     
     cardsContainer.innerHTML = '';
-    cardsContainer.style.display = '';
+    cardsContainer.style.display = 'flex';
     
     const level3Container = document.createElement('div');
     level3Container.className = 'level3-container';
     
-    // Moneda (inicialmente sin mostrar resultado)
-    const coinDiv = document.createElement('div');
-    coinDiv.className = 'coin-display';
-    coinDiv.id = 'coin';
-    coinDiv.textContent = '?';
-    level3Container.appendChild(coinDiv);
-    
-    // Panel de apuestas
-    const betPanel = document.createElement('div');
-    betPanel.className = 'bet-panel';
-    
-    // Info del banco y rondas
-    const betInfo = document.createElement('div');
-    betInfo.className = 'bet-info';
-    
-    const bankDisplay = document.createElement('div');
-    bankDisplay.className = 'bank-display';
-    bankDisplay.textContent = `Banco: ${formatScoreValue(score)} puntos`;
-    
-    const roundsInfo = document.createElement('div');
-    roundsInfo.className = 'rounds-info';
-    roundsInfo.textContent = `Lanzamientos restantes: ${coinFlipsRemaining}/5`;
+    // Indicador de lanzamientos restantes debajo del header
+    const flipsRemainingDiv = document.createElement('div');
+    flipsRemainingDiv.className = 'flips-remaining-indicator';
+    flipsRemainingDiv.textContent = `Lanzamientos: ${coinFlipsRemaining}/5`;
     if (isFirstFlip) {
-        roundsInfo.textContent += ' (Obligatorio)';
+        flipsRemainingDiv.textContent += ' ';
     }
+    level3Container.appendChild(flipsRemainingDiv);
     
-    betInfo.appendChild(bankDisplay);
-    betInfo.appendChild(roundsInfo);
-    betPanel.appendChild(betInfo);
+    // Contenedor de moneda con imagen de fondo (más compacto)
+    const coinContainerDiv = document.createElement('div');
+    coinContainerDiv.className = 'coin-container-wrapper';
+    coinContainerDiv.style.position = 'relative';
+    coinContainerDiv.style.width = 'min(160px, 35vw)';
+    coinContainerDiv.style.height = 'min(160px, 35vw)';
+    coinContainerDiv.style.display = 'flex';
+    coinContainerDiv.style.alignItems = 'center';
+    coinContainerDiv.style.justifyContent = 'center';
+    coinContainerDiv.style.margin = '5px auto';
+    
+    const coinContainerBg = document.createElement('img');
+    coinContainerBg.src = 'assets/ui/level3/coin-container.png';
+    coinContainerBg.style.position = 'absolute';
+    coinContainerBg.style.width = '100%';
+    coinContainerBg.style.height = '100%';
+    coinContainerBg.style.objectFit = 'contain';
+    coinContainerBg.style.zIndex = '1';
+    
+    // Moneda con imagen inicial
+    const coinDiv = document.createElement('img');
+    coinDiv.className = 'coin-image';
+    coinDiv.id = 'coin';
+    coinDiv.src = 'assets/ui/level3/inicial-coin.png';
+    coinDiv.style.width = '60%';
+    coinDiv.style.height = '60%';
+    coinDiv.style.objectFit = 'contain';
+    coinDiv.style.zIndex = '2';
+    coinDiv.style.position = 'relative';
+    
+    coinContainerDiv.appendChild(coinContainerBg);
+    coinContainerDiv.appendChild(coinDiv);
+    level3Container.appendChild(coinContainerDiv);
+    
+    // Elección: Cara o Sello (sin título)
+    const choiceButtons = document.createElement('div');
+    choiceButtons.className = 'choice-buttons';
+    
+    const caraBtn = document.createElement('button');
+    caraBtn.className = 'choice-btn';
+    caraBtn.id = 'caraBtn';
+    const caraImg = document.createElement('img');
+    caraImg.src = 'assets/ui/level3/btn-coin-face.png';
+    caraImg.alt = 'Cara';
+    caraImg.style.width = '100%';
+    caraImg.style.height = '100%';
+    caraImg.style.objectFit = 'contain';
+    caraBtn.appendChild(caraImg);
+    
+    const selloBtn = document.createElement('button');
+    selloBtn.className = 'choice-btn';
+    selloBtn.id = 'selloBtn';
+    const selloImg = document.createElement('img');
+    selloImg.src = 'assets/ui/level3/btn-coin-tails.png';
+    selloImg.alt = 'Sello';
+    selloImg.style.width = '100%';
+    selloImg.style.height = '100%';
+    selloImg.style.objectFit = 'contain';
+    selloBtn.appendChild(selloImg);
+    
+    // Selección de cara/sello
+    caraBtn.addEventListener('click', () => {
+        selectedCoin = 'cara';
+        caraBtn.classList.add('selected');
+        selloBtn.classList.remove('selected');
+    });
+    
+    selloBtn.addEventListener('click', () => {
+        selectedCoin = 'sello';
+        selloBtn.classList.add('selected');
+        caraBtn.classList.remove('selected');
+    });
+    
+    choiceButtons.appendChild(caraBtn);
+    choiceButtons.appendChild(selloBtn);
+    level3Container.appendChild(choiceButtons);
+    
+    // Controles sin panel contenedor (sin cuadro blanco)
     
     // Input de apuesta
     const betInputGroup = document.createElement('div');
     betInputGroup.className = 'bet-input-group';
     
+    // Crear contenedor para el título
     const betLabel = document.createElement('div');
     betLabel.className = 'bet-label';
-    betLabel.textContent = 'Cantidad a apostar (mín: 1)';
+    betLabel.style.position = 'relative';
+    betLabel.style.width = '100%';
+    betLabel.style.display = 'flex';
+    betLabel.style.alignItems = 'center';
+    betLabel.style.justifyContent = 'center';
+    
+    // Título "CANTIDAD"
+    const titleText = document.createElement('span');
+    titleText.textContent = 'CANTIDAD';
+    titleText.style.font = '700 14px Montserrat';
+    titleText.style.color = '#ffffff';
+    titleText.style.textAlign = 'center';
+    
+    betLabel.appendChild(titleText);
     
     const betInput = document.createElement('input');
     betInput.type = 'number';
@@ -575,51 +789,22 @@ function renderLevel3() {
     betInputGroup.appendChild(betLabel);
     betInputGroup.appendChild(betInput);
     betInputGroup.appendChild(betSlider);
-    betPanel.appendChild(betInputGroup);
-    
-    // Elección: Cara o Sello
-    const choiceLabel = document.createElement('div');
-    choiceLabel.className = 'bet-label';
-    choiceLabel.textContent = 'Elige tu predicción:';
-    betPanel.appendChild(choiceLabel);
-    
-    const choiceButtons = document.createElement('div');
-    choiceButtons.className = 'choice-buttons';
-    
-    const caraBtn = document.createElement('button');
-    caraBtn.className = 'choice-btn';
-    caraBtn.textContent = 'CARA';
-    caraBtn.id = 'caraBtn';
-    
-    const selloBtn = document.createElement('button');
-    selloBtn.className = 'choice-btn';
-    selloBtn.textContent = 'SELLO';
-    selloBtn.id = 'selloBtn';
-    
-    // Selección de cara/sello
-    caraBtn.addEventListener('click', () => {
-        selectedCoin = 'cara';
-        caraBtn.classList.add('selected');
-        selloBtn.classList.remove('selected');
-    });
-    
-    selloBtn.addEventListener('click', () => {
-        selectedCoin = 'sello';
-        selloBtn.classList.add('selected');
-        caraBtn.classList.remove('selected');
-    });
-    
-    choiceButtons.appendChild(caraBtn);
-    choiceButtons.appendChild(selloBtn);
-    betPanel.appendChild(choiceButtons);
+    level3Container.appendChild(betInputGroup);
     
     // Botones de acción
     const actionButtons = document.createElement('div');
     actionButtons.className = 'action-buttons';
     
     const flipBtn = document.createElement('button');
-    flipBtn.className = 'action-btn';
-    flipBtn.textContent = isFirstFlip ? 'Lanzar Moneda' : 'Apostar';
+    flipBtn.className = 'action-btn flip-btn';
+    const flipBtnImg = document.createElement('img');
+    flipBtnImg.src = isFirstFlip ? 'assets/ui/common/btn-lanzar.png' : 'assets/ui/common/btn-apostar.png';
+    flipBtnImg.alt = isFirstFlip ? 'Lanzar' : 'Apostar';
+    flipBtnImg.style.width = '100%';
+    flipBtnImg.style.height = '100%';
+    flipBtnImg.style.objectFit = 'contain';
+    flipBtn.appendChild(flipBtnImg);
+    
     flipBtn.addEventListener('click', () => {
         if (!selectedCoin) {
             alert('Debes elegir CARA o SELLO');
@@ -641,16 +826,21 @@ function renderLevel3() {
     // Botón "Plantarse" (solo después de la primera tirada)
     if (!isFirstFlip) {
         const standBtn = document.createElement('button');
-        standBtn.className = 'action-btn secondary';
-        standBtn.textContent = 'Plantarse';
+        standBtn.className = 'action-btn secondary stand-btn';
+        const standBtnImg = document.createElement('img');
+        standBtnImg.src = 'assets/ui/common/btn-plantarse.png';
+        standBtnImg.alt = 'Plantarse';
+        standBtnImg.style.width = '100%';
+        standBtnImg.style.height = '100%';
+        standBtnImg.style.objectFit = 'contain';
+        standBtn.appendChild(standBtnImg);
         standBtn.addEventListener('click', () => {
             endLevel3();
         });
         actionButtons.appendChild(standBtn);
     }
     
-    betPanel.appendChild(actionButtons);
-    level3Container.appendChild(betPanel);
+    level3Container.appendChild(actionButtons);
     
     cardsContainer.appendChild(level3Container);
 }
@@ -662,9 +852,8 @@ function executeCoinFlip() {
     
     const coin = document.getElementById('coin');
     
-    // Animación de lanzamiento
-    coin.classList.add('flipping');
-    coin.textContent = '...';
+    // Animación de lanzamiento - agregar clase de flip
+    coin.classList.add('coin-flipping');
     
     setTimeout(() => {
         // Generar resultado aleatorio
@@ -673,10 +862,13 @@ function executeCoinFlip() {
         // Verificar si ganó
         const won = (result === selectedCoin);
         
-        // Actualizar moneda visual
-        coin.classList.remove('flipping');
-        coin.classList.add(result);
-        coin.textContent = result === 'cara' ? 'CARA' : 'SELLO';
+        // Actualizar imagen de la moneda según resultado
+        coin.classList.remove('coin-flipping');
+        if (result === 'cara') {
+            coin.src = 'assets/ui/level3/coin-face.png';
+        } else {
+            coin.src = 'assets/ui/level3/coin-tails.png';
+        }
         
         // Calcular ganancia/pérdida
         let payout = 0;
@@ -693,16 +885,20 @@ function executeCoinFlip() {
         score = Math.round(score * 100) / 100;
         updateScoreDisplay();
         
+        // Actualizar también el contador de coins
+        const coinsValue = document.getElementById('coins-value');
+        if (coinsValue) coinsValue.textContent = formatScoreValue(score);
+        
         // Actualizar estado
         coinFlipsRemaining--;
         isFirstFlip = false;
         
-        // Mostrar resultado
+        // Mostrar resultado después de que se vea la moneda
         setTimeout(() => {
             showCoinFlipResult(won, payout, result);
-        }, 800);
+        }, 500);
         
-    }, 1000);
+    }, 1500);
 }
 
 function showCoinFlipResult(won, payout, result) {
@@ -713,46 +909,122 @@ function showCoinFlipResult(won, payout, result) {
     const resultDiv = document.createElement('div');
     resultDiv.className = 'flip-result';
     
-    // Moneda con resultado
-    const coinDiv = document.createElement('div');
-    coinDiv.className = `coin-display ${result}`;
-    coinDiv.textContent = result === 'cara' ? 'CARA' : 'SELLO';
+    // Moneda con resultado usando la imagen
+    const coinImg = document.createElement('img');
+    coinImg.className = 'result-coin-image';
+    coinImg.src = result === 'cara' ? 'assets/ui/level3/coin-face.png' : 'assets/ui/level3/coin-tails.png';
+    coinImg.style.width = 'min(150px, 30vw)';
+    coinImg.style.height = 'min(150px, 30vw)';
+    coinImg.style.objectFit = 'contain';
     
     const messageDiv = document.createElement('div');
     messageDiv.className = won ? 'flip-message win' : 'flip-message lose';
+    messageDiv.style.position = 'relative';
+    messageDiv.style.width = '200px';
+    messageDiv.style.height = '220px';
+    messageDiv.style.display = 'flex';
+    messageDiv.style.alignItems = 'center';
+    messageDiv.style.justifyContent = 'center';
+    messageDiv.style.padding = '0';
+    messageDiv.style.borderRadius = '0';
+    messageDiv.style.background = 'none';
+    messageDiv.style.border = 'none';
+    messageDiv.style.boxShadow = 'none';
     
+    // Usar las imágenes correct.png o incorrect.png
+    const messageImg = document.createElement('img');
     if (won) {
-        messageDiv.textContent = `¡Ganaste! +${formatScoreValue(payout - currentBet)} puntos`;
+        messageImg.src = 'assets/ui/common/correct.png';
+        messageImg.alt = '¡Correcto!';
     } else {
-        messageDiv.textContent = `Perdiste -${formatScoreValue(currentBet)} puntos`;
+        messageImg.src = 'assets/ui/common/incorrect.png';
+        messageImg.alt = '¡Incorrecto!';
     }
+    messageImg.style.width = '100%';
+    messageImg.style.height = '100%';
+    messageImg.style.objectFit = 'contain';
+    messageDiv.appendChild(messageImg);
+    
+    // Crear animación numérica
+    const pointsText = document.createElement('div');
+    pointsText.className = 'points-animation';
+    // Calcular puntos ganados/perdidos
+    if (won) {
+        const pointsGained = payout - currentBet; // Ganancia neta
+        pointsText.textContent = `+${formatScoreValue(pointsGained)}`;
+        pointsText.classList.add('points-positive');
+    } else {
+        pointsText.textContent = `-${formatScoreValue(currentBet)}`;
+        pointsText.classList.add('points-negative');
+    }
+    messageDiv.appendChild(pointsText);
+    
+    // Iniciar animación después de un pequeño delay
+    setTimeout(() => {
+        pointsText.classList.add('animate');
+    }, 100);
+    
+    // Eliminar el elemento después de la animación
+    setTimeout(() => {
+        if (pointsText.parentNode) {
+            pointsText.parentNode.removeChild(pointsText);
+        }
+    }, 2000);
     
     const bankDiv = document.createElement('div');
     bankDiv.className = 'bank-display';
-    bankDiv.textContent = `Banco actual: ${formatScoreValue(score)} puntos`;
+    bankDiv.style.display = 'flex';
+    bankDiv.style.alignItems = 'center';
+    bankDiv.style.justifyContent = 'center';
+    bankDiv.style.gap = '8px';
     
-    resultDiv.appendChild(coinDiv);
+    const coinsImg = document.createElement('img');
+    coinsImg.src = 'assets/ui/level3/coins.png';
+    coinsImg.alt = 'Monedas';
+    coinsImg.style.width = '40px';
+    coinsImg.style.height = '40px';
+    coinsImg.style.objectFit = 'contain';
+    
+    const coinsValue = document.createElement('span');
+    coinsValue.textContent = formatScoreValue(score);
+    coinsValue.style.font = '700 18px Montserrat';
+    coinsValue.style.color = '#ffffff';
+    
+    bankDiv.appendChild(coinsImg);
+    bankDiv.appendChild(coinsValue);
+    
+    resultDiv.appendChild(coinImg);
     resultDiv.appendChild(messageDiv);
     resultDiv.appendChild(bankDiv);
     
     // Botón para continuar
     const continueBtn = document.createElement('button');
     continueBtn.className = 'continue-btn';
+    continueBtn.style.background = 'none';
+    continueBtn.style.border = 'none';
+    continueBtn.style.padding = '0';
+    continueBtn.style.cursor = 'pointer';
     
-    // Decidir qué mostrar según el estado
+    const continueImg = document.createElement('img');
+    continueImg.src = 'assets/ui/common/continue.png';
+    continueImg.alt = 'Continuar';
+    continueImg.style.width = '100%';
+    continueImg.style.height = '100%';
+    continueImg.style.objectFit = 'contain';
+    continueImg.style.display = 'block';
+    continueBtn.appendChild(continueImg);
+    
+    // Decidir qué hacer según el estado
     if (score < 1) {
         // No puede seguir apostando
-        continueBtn.textContent = 'Finalizar Juego';
         continueBtn.addEventListener('click', () => endLevel3());
     } else if (coinFlipsRemaining <= 0) {
         // Sin rondas restantes
-        continueBtn.textContent = 'Finalizar Nivel 3';
         continueBtn.addEventListener('click', () => endLevel3());
     } else {
         // Puede continuar
-        continueBtn.textContent = 'Continuar';
         continueBtn.addEventListener('click', () => {
-            // Reset selección
+            // Reset selección y volver a mostrar imagen inicial
             selectedCoin = null;
             renderLevel3();
         });
@@ -765,43 +1037,71 @@ function showCoinFlipResult(won, payout, result) {
 function endLevel3() {
     if (!cardsContainer) return;
     
+    // Cambiar el fondo del game-screen a la imagen de puntuación
+    const gameScreen = document.querySelector('.game-screen');
+    if (gameScreen) {
+        gameScreen.style.backgroundImage = 'url(assets/puntuacionf.png)';
+        gameScreen.style.backgroundSize = 'cover';
+        gameScreen.style.backgroundPosition = 'center';
+        gameScreen.style.backgroundRepeat = 'no-repeat';
+    }
+    
+    // Ocultar los contadores superiores
+    const countersBar = document.querySelector('.counters-bar');
+    if (countersBar) {
+        countersBar.style.display = 'none';
+    }
+    
+    // Ocultar el header del nivel
+    const levelHeader = document.querySelector('.level-header');
+    if (levelHeader) {
+        levelHeader.style.display = 'none';
+    }
+    
     cardsContainer.innerHTML = '';
     
     const endDiv = document.createElement('div');
-    endDiv.className = 'game-end';
+    endDiv.className = 'game-end-final';
     
-    const titleDiv = document.createElement('div');
-    titleDiv.className = 'end-title';
-    titleDiv.textContent = '¡Juego Completado!';
-    
+    // Solo mostrar los puntos (ajusta la posición según tu diseño de imagen)
     const finalScoreDiv = document.createElement('div');
-    finalScoreDiv.className = 'final-score';
-    finalScoreDiv.textContent = `Puntuación Final: ${formatScoreValue(score)} puntos`;
+    finalScoreDiv.className = 'final-score-value';
+    finalScoreDiv.textContent = formatScoreValue(score);
+    finalScoreDiv.style.font = '900 min(120px, 20vw) Montserrat';
+    finalScoreDiv.style.color = '#ffffff';
+    finalScoreDiv.style.textShadow = '4px 4px 8px rgba(0,0,0,0.9), 0 0 20px rgba(0,0,0,0.5)';
+    finalScoreDiv.style.textAlign = 'center';
+    finalScoreDiv.style.position = 'relative';
+    finalScoreDiv.style.zIndex = '10';
+    finalScoreDiv.style.fontWeight = '900';
+    finalScoreDiv.style.letterSpacing = '2px';
+    // Text stroke para hacerlo más bold
+    finalScoreDiv.style.webkitTextStroke = '3px rgba(0,0,0,0.3)';
+    finalScoreDiv.style.textStroke = '3px rgba(0,0,0,0.3)';
+    // Ajusta estos valores según donde quieras que aparezcan los puntos en tu imagen
+    // Puedes cambiar marginTop para desplazar verticalmente
+    finalScoreDiv.style.marginTop = 'min(300px, 40vh)';
+    finalScoreDiv.style.marginBottom = '20px';
     
-    const messageDiv = document.createElement('div');
-    messageDiv.style.font = '600 16px Montserrat';
-    messageDiv.style.color = '#666';
-    messageDiv.style.textAlign = 'center';
-    messageDiv.style.marginTop = '10px';
+    endDiv.appendChild(finalScoreDiv);
     
-    if (score >= 50) {
-        messageDiv.textContent = 'Eres un maestro del azar';
-    } else if (score >= 20) {
-        messageDiv.textContent = '¡Bien hecho! Gran puntuación';
-    } else if (score >= 10) {
-        messageDiv.textContent = 'Buen intento, sigue practicando';
-    } else {
-        messageDiv.textContent = 'La suerte no estuvo de tu lado hoy';
-    }
-    
+    // Botón de jugar de nuevo
     const restartBtn = document.createElement('button');
-    restartBtn.className = 'restart-btn';
+    restartBtn.className = 'restart-btn-final';
     restartBtn.textContent = 'Jugar de Nuevo';
     restartBtn.addEventListener('click', () => location.reload());
+    restartBtn.style.marginTop = '20px';
+    restartBtn.style.position = 'relative';
+    restartBtn.style.zIndex = '10';
+    restartBtn.style.background = '#d0b9d9';
+    restartBtn.style.borderRadius = '30px';
+    restartBtn.style.fontWeight = '900';
+    restartBtn.style.border = '6px solid white';
+    restartBtn.style.padding = '14px 32px';
+    restartBtn.style.cursor = 'pointer';
+    restartBtn.style.transition = 'all .2s ease';
+    restartBtn.style.boxShadow = '0 6px 18px rgba(208, 185, 217, .3)';
     
-    endDiv.appendChild(titleDiv);
-    endDiv.appendChild(finalScoreDiv);
-    endDiv.appendChild(messageDiv);
     endDiv.appendChild(restartBtn);
     
     cardsContainer.appendChild(endDiv);
