@@ -2,6 +2,10 @@
 const SoundManager = {
     sounds: {},
     currentLoopingSounds: {},
+    currentBackgroundSound: null,
+    activeSounds: [],
+    musicMuted: false,
+    lastBackgroundLevel: 1,
     
     // Función para cargar un sonido con detección automática de formato
     loadSound(name, basePath) {
@@ -51,6 +55,10 @@ const SoundManager = {
     
     // Reproducir un sonido
     play(name, options = {}) {
+        if (this.musicMuted) {
+            return null;
+        }
+        
         // Si es un sonido de fondo, no pausar otros sonidos
         const isBackgroundSound = name.includes('Bg');
         
@@ -151,14 +159,18 @@ const SoundManager = {
         });
     },
     
-    currentBackgroundSound: null, // Referencia al sonido de fondo actual
-    activeSounds: [], // Lista de sonidos activos (no de fondo)
-    
     // Reproducir sonido de fondo de un nivel
     playBackgroundMusic(level) {
+        this.lastBackgroundLevel = level;
+        
         // Detener el sonido de fondo anterior si existe
         if (this.currentBackgroundSound) {
             this.stopBackgroundMusic();
+        }
+        
+        // Si la música está silenciada, no reproducir
+        if (this.musicMuted) {
+            return;
         }
         
         const soundName = `level${level}Bg`;
@@ -194,6 +206,21 @@ const SoundManager = {
             this.currentBackgroundSound.pause();
             this.currentBackgroundSound.currentTime = 0;
             this.currentBackgroundSound = null;
+        }
+    },
+    
+    setMusicMuted(muted) {
+        this.musicMuted = muted;
+        if (muted) {
+            this.stopBackgroundMusic();
+            this.stopAll();
+            this.activeSounds.forEach(audio => {
+                audio.pause();
+                audio.currentTime = 0;
+            });
+            this.activeSounds = [];
+        } else if (this.lastBackgroundLevel) {
+            this.playBackgroundMusic(this.lastBackgroundLevel);
         }
     },
     
@@ -244,8 +271,26 @@ const dice = document.querySelector('.dice');
 const rollBtn = document.querySelector('.action-button');
 const resultEl = document.getElementById('result');
 const scoreEl = document.getElementById('score-value');
+const soundToggleBtn = document.getElementById('sound-toggle-btn');
+const soundToggleIcon = document.getElementById('sound-toggle-icon');
 const cardsContainer = document.getElementById('cards');
 const operationsDisplay = document.getElementById('operations-display');
+
+function updateSoundToggleUI() {
+    if (!soundToggleBtn || !soundToggleIcon) return;
+    const muted = SoundManager.musicMuted;
+    soundToggleIcon.textContent = muted ? '🔇' : '🔊';
+    soundToggleBtn.setAttribute('aria-pressed', muted ? 'true' : 'false');
+}
+
+if (soundToggleBtn) {
+    soundToggleBtn.addEventListener('click', () => {
+        SoundManager.setMusicMuted(!SoundManager.musicMuted);
+        updateSoundToggleUI();
+    });
+    
+    updateSoundToggleUI();
+}
 
 const randomDice = () => {
     // Genera un número entero entre 1 y 6 (inclusive)
@@ -330,13 +375,17 @@ const rollDice = random => {
             pendingOp = null;
 
             if (availableOps.length > 0) {
-                if (cardsContainer) cardsContainer.style.display = 'flex';
+                if (cardsContainer) {
+                    cardsContainer.style.display = 'flex';
+                    cardsContainer.style.flexDirection = 'row'; // Asegurar que estén en un renglón
+                }
                 renderCards(random);
                 rollBtn.disabled = true;
                 rollBtn.style.opacity = '0.6';
             } else {
                 setTimeout(() => {
-                    startLevel2();
+                    // Mostrar intro del nivel 2 antes de iniciarlo
+                    showIntroScreen(2);
                 }, 1000);
             }
 
@@ -353,7 +402,10 @@ const rollDice = random => {
 
             // Mostrar tarjetas para elegir la operación siguiente
             if (availableOps.length > 0) {
-                if (cardsContainer) cardsContainer.style.display = 'flex';
+                if (cardsContainer) {
+                    cardsContainer.style.display = 'flex';
+                    cardsContainer.style.flexDirection = 'row'; // Asegurar que estén en un renglón
+                }
                 renderCards(random);
                 rollBtn.disabled = true;
                 rollBtn.style.opacity = '0.6';
@@ -524,11 +576,29 @@ function applyOperation(op, value) {
 // ========== LEVEL 2: Card Prediction Game ==========
 
 function startLevel2() {
+    // Eliminar botón Next si existe
+    const existingNextBtn = document.querySelector('.intro-next-btn');
+    if (existingNextBtn) existingNextBtn.remove();
+    
+    // Restaurar fondo del nivel 2
+    const gameScreen = document.querySelector('.game-screen');
+    if (gameScreen) {
+        gameScreen.style.backgroundImage = '';
+        gameScreen.style.backgroundColor = '';
+        setGameScreenLevel(2);
+    }
+    
+    // Mostrar contadores
+    const countersBar = document.querySelector('.counters-bar');
+    if (countersBar) countersBar.style.display = 'flex';
+    
+    // Mostrar header del nivel
+    const levelHeader = document.querySelector('.level-header');
+    if (levelHeader) levelHeader.style.display = 'flex';
+    
     gameLevel = 2;
     level2Started = true;
     roundsRemaining = 10;
-    // Update visual background for level 2
-    setGameScreenLevel(2);
     
     // Reproducir música de fondo del nivel 2
     SoundManager.playBackgroundMusic(2);
@@ -853,27 +923,272 @@ function showPredictionResult(nextCard, correct, points) {
 function endGame() {
     if (!cardsContainer) return;
     
-    // Pasar directamente al nivel 3 sin mostrar resumen
+    // Mostrar intro del nivel 3 antes de iniciarlo
+    showIntroScreen(3);
+}
+
+// ========== SISTEMA DE PANTALLAS DE INTRODUCCIÓN ==========
+
+// Iniciar nivel 1
+function startLevel1() {
+    // Eliminar botón Next si existe
+    const existingNextBtn = document.querySelector('.intro-next-btn');
+    if (existingNextBtn) existingNextBtn.remove();
+    
+    // Restaurar fondo del nivel 1
+    const gameScreen = document.querySelector('.game-screen');
+    if (gameScreen) {
+        gameScreen.style.backgroundImage = '';
+        gameScreen.style.backgroundColor = '';
+        setGameScreenLevel(1);
+    }
+    
+    // Mostrar contadores
+    const countersBar = document.querySelector('.counters-bar');
+    if (countersBar) countersBar.style.display = 'flex';
+    
+    // Mostrar header del nivel
+    const levelHeader = document.querySelector('.level-header');
+    if (levelHeader) levelHeader.style.display = 'flex';
+    
+    // Mostrar elementos del nivel 1
+    const diceContainer = document.querySelector('.dice-container');
+    if (diceContainer) diceContainer.style.display = 'flex';
+    
+    if (operationsDisplay) operationsDisplay.style.display = 'flex';
+    
+    if (rollBtn) rollBtn.style.display = 'block';
+    
+    if (resultEl) {
+        resultEl.style.display = 'none';
+    }
+    
+    // Limpiar contenedor de cards y restaurar estilo original
+    if (cardsContainer) {
+        cardsContainer.innerHTML = '';
+        cardsContainer.style.display = 'none';
+        // Restaurar flexDirection a row para que las operaciones se muestren en un renglón
+        cardsContainer.style.flexDirection = 'row';
+        cardsContainer.style.alignItems = 'center';
+        cardsContainer.style.justifyContent = 'center';
+    }
+    
+    gameLevel = 1;
+    
+    // Reproducir música de fondo del nivel 1
+    SoundManager.playBackgroundMusic(1);
+}
+
+// Mostrar pantalla de introducción
+function showIntroScreen(introIndex) {
+    if (!cardsContainer) return;
+    
+    // Eliminar botón Next anterior si existe
+    const existingNextBtn = document.querySelector('.intro-next-btn');
+    if (existingNextBtn) existingNextBtn.remove();
+    
+    // Ocultar contadores mientras se muestra la intro
+    const countersBar = document.querySelector('.counters-bar');
+    if (countersBar) countersBar.style.display = 'none';
+    
+    // Ocultar header del nivel
+    const levelHeader = document.querySelector('.level-header');
+    if (levelHeader) levelHeader.style.display = 'none';
+    
+    // Ocultar elementos del juego
+    const diceContainer = document.querySelector('.dice-container');
+    if (diceContainer) diceContainer.style.display = 'none';
+    
+    if (operationsDisplay) operationsDisplay.style.display = 'none';
+    
+    if (rollBtn) rollBtn.style.display = 'none';
+    
+    if (resultEl) resultEl.style.display = 'none';
+    
+    // Cambiar fondo del juego para intro1, intro2, intro3
+    const gameScreen = document.querySelector('.game-screen');
+    if (gameScreen) {
+        if (introIndex === 0) {
+            // Intro general: mantener fondo actual
+        } else if (introIndex === 1) {
+            gameScreen.style.backgroundImage = 'url(assets/ui/level1/intro1.png)';
+            gameScreen.style.backgroundSize = 'cover';
+            gameScreen.style.backgroundPosition = 'center';
+        } else if (introIndex === 2) {
+            gameScreen.style.backgroundImage = 'url(assets/ui/level2/intro2.png)';
+            gameScreen.style.backgroundSize = 'cover';
+            gameScreen.style.backgroundPosition = 'center';
+        } else if (introIndex === 3) {
+            gameScreen.style.backgroundImage = 'url(assets/ui/level3/intro3.png)';
+            gameScreen.style.backgroundSize = 'cover';
+            gameScreen.style.backgroundPosition = 'center';
+        }
+    }
+    
+    // Limpiar contenedor
     cardsContainer.innerHTML = '';
-    startLevel3();
+    cardsContainer.style.display = 'flex';
+    cardsContainer.style.flexDirection = 'column';
+    cardsContainer.style.alignItems = 'center';
+    cardsContainer.style.justifyContent = 'center';
+    cardsContainer.style.width = '100%';
+    cardsContainer.style.height = '100%';
+    cardsContainer.style.position = 'relative';
+    
+    // Contenedor principal de la intro (solo para intro general)
+    if (introIndex === 0) {
+        const introContainer = document.createElement('div');
+        introContainer.className = 'intro-container';
+        introContainer.style.position = 'relative';
+        introContainer.style.width = '100%';
+        introContainer.style.height = '100%';
+        introContainer.style.display = 'flex';
+        introContainer.style.alignItems = 'center';
+        introContainer.style.justifyContent = 'center';
+        
+        // Imagen de introducción general
+        const introImg = document.createElement('img');
+        introImg.src = 'assets/ui/common/intro.png';
+        introImg.alt = 'Introducción General';
+        introImg.style.maxWidth = '100%';
+        introImg.style.maxHeight = '100%';
+        introImg.style.objectFit = 'contain';
+        introContainer.appendChild(introImg);
+        
+        // Botón Play (SOLO en la intro general - introIndex === 0)
+        const playBtn = document.createElement('button');
+        playBtn.className = 'intro-play-btn';
+        playBtn.style.position = 'absolute';
+        playBtn.style.top = '80%'; // Ajuste para evitar que se corte
+        playBtn.style.left = '50%';
+        playBtn.style.transform = 'translateX(-50%)';
+        playBtn.style.background = 'none';
+        playBtn.style.border = 'none';
+        playBtn.style.borderRadius = '15px';
+        playBtn.style.padding = '0';
+        playBtn.style.cursor = 'pointer';
+        playBtn.style.opacity = '0.9';
+        playBtn.style.transition = 'opacity 0.2s, transform 0.2s';
+        playBtn.style.zIndex = '10';
+        playBtn.style.overflow = 'visible';
+        
+        playBtn.addEventListener('mouseenter', () => {
+            playBtn.style.opacity = '1';
+            playBtn.style.transform = 'translateX(-50%) scale(1.05)';
+        });
+        playBtn.addEventListener('mouseleave', () => {
+            playBtn.style.opacity = '0.9';
+            playBtn.style.transform = 'translateX(-50%) scale(1)';
+        });
+        
+        const playImg = document.createElement('img');
+        playImg.src = 'assets/ui/common/play.png';
+        playImg.alt = 'Jugar';
+        playImg.style.display = 'block';
+        playImg.style.width = '100%';
+        playImg.style.height = 'auto';
+        playImg.style.maxWidth = '220px';
+        playImg.style.maxHeight = '90px';
+        playImg.style.objectFit = 'contain';
+        playImg.style.borderRadius = '15px';
+        playBtn.appendChild(playImg);
+        
+        playBtn.addEventListener('click', () => {
+            SoundManager.play('btnOperacionClick');
+            // Mostrar intro del nivel 1 antes de iniciarlo
+            showIntroScreen(1);
+        });
+        
+        introContainer.appendChild(playBtn);
+        cardsContainer.appendChild(introContainer);
+    }
+    
+    // Botón Next (SOLO en intro1, intro2, intro3)
+    if (introIndex > 0) {
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'intro-next-btn';
+        nextBtn.style.position = 'fixed';
+        nextBtn.style.bottom = '20px';
+        nextBtn.style.right = '20px';
+        nextBtn.style.background = 'rgba(0, 0, 0, 0.3)';
+        nextBtn.style.border = 'none';
+        nextBtn.style.borderRadius = '50%';
+        nextBtn.style.padding = '10px';
+        nextBtn.style.cursor = 'pointer';
+        nextBtn.style.opacity = '0.7';
+        nextBtn.style.transition = 'all 0.2s';
+        nextBtn.style.width = '50px';
+        nextBtn.style.height = '50px';
+        nextBtn.style.display = 'flex';
+        nextBtn.style.alignItems = 'center';
+        nextBtn.style.justifyContent = 'center';
+        nextBtn.style.zIndex = '9999';
+        
+        nextBtn.addEventListener('mouseenter', () => {
+            nextBtn.style.opacity = '1';
+            nextBtn.style.background = 'rgba(0, 0, 0, 0.5)';
+        });
+        nextBtn.addEventListener('mouseleave', () => {
+            nextBtn.style.opacity = '0.7';
+            nextBtn.style.background = 'rgba(0, 0, 0, 0.3)';
+        });
+        
+        const nextImg = document.createElement('img');
+        nextImg.src = 'assets/ui/common/next.png';
+        nextImg.alt = 'Siguiente';
+        nextImg.style.width = '30px';
+        nextImg.style.height = '30px';
+        nextImg.style.objectFit = 'contain';
+        nextBtn.appendChild(nextImg);
+        
+        nextBtn.addEventListener('click', () => {
+            SoundManager.play('btnOperacionClick');
+            if (introIndex === 1) {
+                startLevel1();
+            } else if (introIndex === 2) {
+                startLevel2();
+            } else if (introIndex === 3) {
+                startLevel3();
+            }
+        });
+        
+        document.body.appendChild(nextBtn);
+    }
 }
 
 // Initialize display
 updateScoreDisplay();
 
-// Reproducir música de fondo del nivel 1 al cargar
-SoundManager.playBackgroundMusic(1);
+// Mostrar pantalla de introducción general al cargar
+showIntroScreen(0);
 
 // ========== LEVEL 3: Coin Flip Betting Game ==========
 
 function startLevel3() {
+    // Eliminar botón Next si existe
+    const existingNextBtn = document.querySelector('.intro-next-btn');
+    if (existingNextBtn) existingNextBtn.remove();
+    
+    // Restaurar fondo del nivel 3
+    const gameScreen = document.querySelector('.game-screen');
+    if (gameScreen) {
+        gameScreen.style.backgroundImage = '';
+        gameScreen.style.backgroundColor = '';
+        setGameScreenLevel(3);
+    }
+    
+    // Mostrar contadores
+    const countersBar = document.querySelector('.counters-bar');
+    if (countersBar) countersBar.style.display = 'flex';
+    
+    // Mostrar header del nivel
+    const levelHeader = document.querySelector('.level-header');
+    if (levelHeader) levelHeader.style.display = 'flex';
+    
     gameLevel = 3;
     level3Started = true;
     coinFlipsRemaining = 5;
     isFirstFlip = true;
-
-    // Update visual background for level 3
-    setGameScreenLevel(3);
     
     // Reproducir música de fondo del nivel 3
     SoundManager.playBackgroundMusic(3);

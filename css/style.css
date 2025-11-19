@@ -83,8 +83,45 @@ body {
     z-index: 1;
 }
 
+.coins-counter {
+    padding-left: 0;
+    padding-right: min(10px, 1vw);
+}
+
 .coins-counter .counter-value {
-    margin-left: 14px;
+    margin-left: 18px;
+}
+
+.sound-toggle-btn {
+    position: absolute;
+    top: min(20px, 3vh);
+    right: min(5px, 1vw);
+    width: min(48px, 9vw);
+    height: min(48px, 9vw);
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: min(22px, 4vw);
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    z-index: 150;
+}
+
+.sound-toggle-btn:hover {
+    transform: scale(1.05);
+}
+
+.sound-toggle-btn:active {
+    transform: scale(0.95);
+}
+
+.sound-toggle-icon {
+    pointer-events: none;
+    line-height: 1;
 }
 
 /* Level header */
@@ -129,7 +166,8 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 15px;
+    justify-content: flex-start;
+    gap: 10px;
     padding: 15px;
     overflow: hidden;
 }
@@ -154,7 +192,7 @@ body {
 /* Dice container */
 .dice-container {
     position: relative;
-    width: min(450px, 70%);
+    width: min(450px, 85vw, 90%);
     height: auto;
     aspect-ratio: 800/700;
     display: flex;
@@ -174,8 +212,10 @@ body {
 
 /* Dice styles */
 .dice {
-    width: min(100px, 15vw);
-    height: min(100px, 15vw);
+    width: min(120px, 20vw, 25vh);
+    height: min(120px, 20vw, 25vh);
+    min-width: 80px;
+    min-height: 80px;
     position: relative;
     transform-style: preserve-3d;
     transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
@@ -300,6 +340,177 @@ body {
     
     .counters-bar {
         top: min(10px, 1vh);
+    }
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .dice {
+        width: min(100px, 18vw, 20vh);
+        height: min(100px, 18vw, 20vh);
+        min-width: 70px;
+        min-height: 70px;
+    }
+    
+    .dice-container {
+        width: min(400px, 90vw);
+    }
+    
+    .operations-display {
+        font-size: min(24px, 4.5vw);
+        padding: 6px 15px;
+        min-height: 40px;
+    }
+    
+    .action-button {
+        width: min(160px, 30vw);
+        height: min(60px, 10vw);
+    }
+    
+    .card {
+        width: min(60px, 14vw);
+        height: min(60px, 14vw);
+    }
+    
+    .counter-icon {
+        width: min(60px, 12vw);
+        height: min(45px, 9vw);
+    }
+    
+    .counter-value {
+        font-size: min(18px, 3.5vw);
+    }
+}
+
+/* Small mobile adjustments */
+@media (max-width: 480px) {
+    .dice {
+        width: min(90px, 22vw, 22vh);
+        height: min(90px, 22vw, 22vh);
+        min-width: 65px;
+        min-height: 65px;
+    }
+    
+    .dice-container {
+        width: min(350px, 95vw);
+    }
+    
+    .operations-display {
+        font-size: min(20px, 5vw);
+        padding: 5px 12px;
+        min-height: 35px;
+    }
+    
+    .action-button {
+        width: min(140px, 35vw);
+        height: min(55px, 12vw);
+    }
+    
+    .card {
+        width: min(55px, 16vw);
+        height: min(55px, 16vw);
+    }
+    
+    .game-container {
+        gap: 10px;
+        padding: 10px;
+    }
+    
+    .level-header {
+        margin-top: min(80px, 12vh);
+        min-height: min(100px, 10vh);
+        max-height: min(150px, 12vh);
+    }
+    
+    .counters-bar {
+        padding: 0 min(20px, 3vw);
+    }
+    
+    #result {
+        font-size: min(28px, 6vw);
+        bottom: 15%;
+    }
+}
+
+/* Botones de navegación en móviles */
+@media (max-width: 768px) {
+    .intro-next-btn {
+        width: 45px !important;
+        height: 45px !important;
+        bottom: 15px !important;
+        right: 15px !important;
+    }
+    
+    .intro-next-btn img {
+        width: 25px !important;
+        height: 25px !important;
+    }
+    
+    .intro-play-btn {
+        max-width: 180px !important;
+        max-height: 70px !important;
+        top: 70% !important; /* Ajustar posición en móvil */
+    }
+    
+    .sound-toggle-btn {
+        width: 42px;
+        height: 42px;
+        font-size: 18px;
+        top: min(15px, 2vh);
+        right: min(6px, 1.5vw);
+    }
+    
+    /* Asegurar que el contenedor de intro tenga suficiente espacio */
+    .intro-container {
+        padding-bottom: 120px !important;
+        min-height: 100vh !important;
+        box-sizing: border-box !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .intro-next-btn {
+        width: 40px !important;
+        height: 40px !important;
+        bottom: 10px !important;
+        right: 10px !important;
+    }
+    
+    .intro-next-btn img {
+        width: 22px !important;
+        height: 22px !important;
+    }
+    
+    .intro-play-btn {
+        max-width: 160px !important;
+        max-height: 60px !important;
+        top: 65% !important; /* Ajustar posición en móvil pequeño */
+    }
+    
+    .sound-toggle-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+        top: min(12px, 2vh);
+        right: min(4px, 1.5vw);
+    }
+    
+    /* Asegurar que el contenedor de intro tenga suficiente espacio */
+    .intro-container {
+        padding-bottom: 150px !important;
+        min-height: 100vh !important;
+        box-sizing: border-box !important;
+    }
+}
+
+/* Para pantallas muy pequeñas en altura */
+@media (max-height: 600px) {
+    .intro-play-btn {
+        top: 60% !important;
+    }
+    
+    .intro-container {
+        padding-bottom: 80px !important;
     }
 }
 
@@ -470,10 +681,22 @@ body {
     justify-content: center;
     align-items: center;
     pointer-events: auto;
-    margin-top: 10px;
+    margin-top: 5px;
+    margin-bottom: 0;
     flex-wrap: nowrap;
     width: 100%;
     overflow: visible;
+}
+
+/* Desktop: reducir gap para que los botones no queden tan abajo */
+@media (min-width: 769px) {
+    .game-container {
+        gap: 8px;
+    }
+    
+    .cards {
+        margin-top: 3px;
+    }
 }
 
 .card {
@@ -555,12 +778,17 @@ body {
 }
 
 .card-front {
-    /* Background set via JS: card-back.png */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .card-back {
     /* Background set via JS: card-front.png */
     transform: rotateY(180deg);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .card-back .card-number {
@@ -980,11 +1208,13 @@ body {
     background-size: 100% 100%;
     outline: none;
     -webkit-appearance: none;
+    appearance: none;
     margin-top: 4px;
 }
 
 .bet-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
+    appearance: none;
     width: 28px;
     height: 28px;
     border-radius: 0;
@@ -1064,7 +1294,7 @@ body {
 }
 
 .action-btn.secondary {
-    /* No additional styles needed for image buttons */
+    background: transparent;
 }
 
 .flip-result {
