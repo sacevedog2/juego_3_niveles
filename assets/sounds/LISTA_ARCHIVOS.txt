@@ -1,0 +1,34 @@
+═══════════════════════════════════════════════════════════════
+LISTA DE ARCHIVOS DE SONIDO A CREAR
+═══════════════════════════════════════════════════════════════
+
+NIVEL 1 - assets/sounds/level1/
+───────────────────────────────────────────────────────────────
+1. btn-girar-click.mp3 (o .ogg o .wav)
+2. dice-rolling.mp3 (o .ogg o .wav)
+3. btn-operacion-click.mp3 (o .ogg o .wav)
+4. resultado-positivo.mp3 (o .ogg o .wav)
+5. resultado-negativo.mp3 (o .ogg o .wav)
+
+NIVEL 2 - assets/sounds/level2/
+───────────────────────────────────────────────────────────────
+1. btn-decision-click.mp3 (o .ogg o .wav)
+2. acierto-victoria.mp3 (o .ogg o .wav)
+3. error-fallo.mp3 (o .ogg o .wav)
+
+NIVEL 3 - assets/sounds/level3/
+───────────────────────────────────────────────────────────────
+1. btn-cara-sello-click.mp3 (o .ogg o .wav)
+2. apuesta-tick.mp3 (o .ogg o .wav)
+3. btn-lanzar.mp3 (o .ogg o .wav)
+4. coin-spinning.mp3 (o .ogg o .wav)
+5. acierto-jingle.mp3 (o .ogg o .wav)
+6. fallo-grave.mp3 (o .ogg o .wav)
+
+═══════════════════════════════════════════════════════════════
+TOTAL: 14 archivos de sonido
+═══════════════════════════════════════════════════════════════
+
+NOTA: Puedes usar la extensión .mp3, .ogg o .wav según prefieras.
+      El código se adaptará automáticamente al formato que uses.
+

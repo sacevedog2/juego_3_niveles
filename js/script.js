@@ -1,3 +1,149 @@
+// ========== SISTEMA DE SONIDOS ==========
+const SoundManager = {
+    sounds: {},
+    currentLoopingSounds: {},
+    
+    // Función para cargar un sonido con detección automática de formato
+    loadSound(name, basePath) {
+        if (this.sounds[name]) return this.sounds[name];
+        
+        // Intentar cargar con diferentes formatos (prioridad: wav, mp3, ogg)
+        const formats = ['wav', 'mp3', 'ogg'];
+        const audio = new Audio();
+        
+        // Intentar con wav primero (la mayoría de archivos son .wav)
+        audio.src = `${basePath}.wav`;
+        audio.preload = 'auto';
+        audio.volume = 0.7;
+        
+        let currentFormat = 0;
+        
+        const tryNextFormat = () => {
+            currentFormat++;
+            if (currentFormat < formats.length) {
+                audio.src = `${basePath}.${formats[currentFormat]}`;
+                audio.load();
+            } else {
+                console.warn(`No se pudo cargar el sonido: ${basePath}`);
+            }
+        };
+        
+        audio.addEventListener('error', tryNextFormat, { once: false });
+        
+        // Guardar referencia cuando se carga exitosamente
+        audio.addEventListener('canplaythrough', () => {
+            audio.removeEventListener('error', tryNextFormat);
+        }, { once: true });
+        
+        audio.load();
+        this.sounds[name] = audio;
+        
+        // Debug: verificar carga
+        audio.addEventListener('loadeddata', () => {
+            console.log(`✓ Sonido cargado: ${name} desde ${audio.src}`);
+        }, { once: true });
+        
+        return audio;
+    },
+    
+    // Reproducir un sonido
+    play(name, options = {}) {
+        if (!this.sounds[name]) {
+            console.warn(`Sonido ${name} no encontrado. Intentando cargar...`);
+            // Intentar cargar de nuevo si no está disponible
+            return null;
+        }
+        
+        // Obtener la ruta del sonido original
+        let originalSrc = this.sounds[name].src;
+        
+        // Si no tiene src, intentar construir la ruta
+        if (!originalSrc || originalSrc === window.location.href) {
+            // Construir la ruta basada en el nombre
+            const pathMap = {
+                'btnGirarClick': 'assets/sounds/level1/btn-girar-click.wav',
+                'diceRolling': 'assets/sounds/level1/dice-rolling.mp3',
+                'btnOperacionClick': 'assets/sounds/level1/btn-operacion-click.wav',
+                'resultadoPositivo': 'assets/sounds/level1/resultado-positivo.wav',
+                'resultadoNegativo': 'assets/sounds/level1/resultado-negativo.wav',
+                'btnDecisionClick': 'assets/sounds/level2/btn-decision-click.wav',
+                'aciertoVictoria': 'assets/sounds/level2/acierto-victoria.wav',
+                'errorFallo': 'assets/sounds/level2/error-fallo.wav',
+                'btnCaraSelloClick': 'assets/sounds/level3/btn-cara-sello-click.wav',
+                'apuestaTick': 'assets/sounds/level3/apuesta-tick.wav',
+                'btnLanzar': 'assets/sounds/level3/btn-lanzar.wav',
+                'coinSpinning': 'assets/sounds/level3/coin-spinning.wav',
+                'aciertoJingle': 'assets/sounds/level3/acierto-jingle.wav',
+                'falloGrave': 'assets/sounds/level3/fallo-grave.wav'
+            };
+            
+            if (pathMap[name]) {
+                originalSrc = pathMap[name];
+            } else {
+                console.warn(`No se encontró ruta para el sonido ${name}`);
+                return null;
+            }
+        }
+        
+        // Crear una nueva instancia de audio
+        const audio = new Audio(originalSrc);
+        audio.volume = options.volume !== undefined ? options.volume : 0.7;
+        
+        if (options.loop) {
+            audio.loop = true;
+            this.currentLoopingSounds[name] = audio;
+        }
+        
+        // Intentar reproducir
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(err => {
+                // Silenciar errores de autoplay (el usuario necesita interactuar primero)
+                if (err.name !== 'NotAllowedError') {
+                    console.log(`No se pudo reproducir el sonido ${name}:`, err, `src: ${originalSrc}`);
+                }
+            });
+        }
+        
+        return audio;
+    },
+    
+    // Detener un sonido que está en loop
+    stop(name) {
+        if (this.currentLoopingSounds[name]) {
+            this.currentLoopingSounds[name].pause();
+            this.currentLoopingSounds[name].currentTime = 0;
+            delete this.currentLoopingSounds[name];
+        }
+    },
+    
+    // Detener todos los sonidos en loop
+    stopAll() {
+        Object.keys(this.currentLoopingSounds).forEach(name => {
+            this.stop(name);
+        });
+    }
+};
+
+// Cargar todos los sonidos del juego con sus formatos específicos
+// Basado en los archivos reales que tienes
+SoundManager.loadSound('btnGirarClick', 'assets/sounds/level1/btn-girar-click');
+SoundManager.loadSound('diceRolling', 'assets/sounds/level1/dice-rolling'); // .mp3
+SoundManager.loadSound('btnOperacionClick', 'assets/sounds/level1/btn-operacion-click');
+SoundManager.loadSound('resultadoPositivo', 'assets/sounds/level1/resultado-positivo');
+SoundManager.loadSound('resultadoNegativo', 'assets/sounds/level1/resultado-negativo');
+
+SoundManager.loadSound('btnDecisionClick', 'assets/sounds/level2/btn-decision-click');
+SoundManager.loadSound('aciertoVictoria', 'assets/sounds/level2/acierto-victoria');
+SoundManager.loadSound('errorFallo', 'assets/sounds/level2/error-fallo');
+
+SoundManager.loadSound('btnCaraSelloClick', 'assets/sounds/level3/btn-cara-sello-click');
+SoundManager.loadSound('apuestaTick', 'assets/sounds/level3/apuesta-tick');
+SoundManager.loadSound('btnLanzar', 'assets/sounds/level3/btn-lanzar');
+SoundManager.loadSound('coinSpinning', 'assets/sounds/level3/coin-spinning');
+SoundManager.loadSound('aciertoJingle', 'assets/sounds/level3/acierto-jingle');
+SoundManager.loadSound('falloGrave', 'assets/sounds/level3/fallo-grave');
+
 const dice = document.querySelector('.dice');
 const rollBtn = document.querySelector('.action-button');
 const resultEl = document.getElementById('result');
@@ -26,9 +172,14 @@ const rollDice = random => {
     // 🔹 Duración variable: si sale 1, el dado para más rápido
     const duration = random === 1 ? 1 : 2; // segundos
     dice.style.animation = `rolling ${duration}s ease-out`;
+    
+    // Reproducir sonido de dado rodando
+    SoundManager.play('diceRolling', { loop: true });
 
     // Esperar a que termine la animación antes de mostrar el resultado
     setTimeout(() => {
+        // Detener sonido de dado rodando
+        SoundManager.stop('diceRolling');
         dice.style.animation = 'none';
         
         // 🔹 Aplicar la rotación final según el número obtenido
@@ -64,6 +215,17 @@ const rollDice = random => {
         if (pendingOp !== null) {
             const previousScore = score;
             applyOperation(pendingOp, random);
+            
+            // Reproducir sonido de resultado (positivo o negativo)
+            const scoreIncreased = score > previousScore;
+            if (scoreIncreased) {
+                SoundManager.play('resultadoPositivo');
+            } else if (score < previousScore) {
+                SoundManager.play('resultadoNegativo');
+            } else {
+                // Si el score no cambió (división por 1, etc.), usar positivo
+                SoundManager.play('resultadoPositivo');
+            }
             
             if (operationsDisplay) {
                 operationsDisplay.textContent = `${formatScoreValue(previousScore)} ${pendingOp} ${random} = ${formatScoreValue(score)}`;
@@ -107,6 +269,7 @@ const rollDice = random => {
 };
 
 rollBtn.addEventListener('click', () => {
+    SoundManager.play('btnGirarClick');
     const n = randomDice();
     rollDice(n);
 });
@@ -195,6 +358,8 @@ function renderCards(value) {
             // If the op was already removed, ignore
             if (!availableOps.includes(op)) return;
 
+            // Reproducir sonido de click en operación
+            SoundManager.play('btnOperacionClick');
             selectionMade = true;
 
             // Set the pending operation to be applied with the next roll
@@ -423,7 +588,10 @@ function createPredictionButton(text, prediction) {
     img.style.objectFit = 'contain';
     btn.appendChild(img);
     
-    btn.addEventListener('click', () => handlePrediction(prediction));
+    btn.addEventListener('click', () => {
+        SoundManager.play('btnDecisionClick');
+        handlePrediction(prediction);
+    });
     return btn;
 }
 
@@ -465,10 +633,14 @@ function handlePrediction(prediction) {
     // Actualizar score
     if (correct) {
         score += pointsEarned;
+        // Reproducir sonido de acierto
+        SoundManager.play('aciertoVictoria');
     } else {
         // Restar 1 punto si es incorrecto
         score -= 1;
         pointsEarned = -1; // Para mostrar la imagen incorrect-1.png
+        // Reproducir sonido de error
+        SoundManager.play('errorFallo');
     }
     
     // Evitar score negativo
@@ -713,12 +885,14 @@ function renderLevel3() {
     
     // Selección de cara/sello
     caraBtn.addEventListener('click', () => {
+        SoundManager.play('btnCaraSelloClick');
         selectedCoin = 'cara';
         caraBtn.classList.add('selected');
         selloBtn.classList.remove('selected');
     });
     
     selloBtn.addEventListener('click', () => {
+        SoundManager.play('btnCaraSelloClick');
         selectedCoin = 'sello';
         selloBtn.classList.add('selected');
         caraBtn.classList.remove('selected');
@@ -776,12 +950,16 @@ function renderLevel3() {
         betInput.value = val;
         betSlider.value = val;
         currentBet = val;
+        // Reproducir sonido de tick al cambiar apuesta
+        SoundManager.play('apuestaTick', { volume: 0.4 });
     });
     
     betSlider.addEventListener('input', (e) => {
         const val = parseInt(e.target.value);
         betInput.value = val;
         currentBet = val;
+        // Reproducir sonido de tick al cambiar apuesta
+        SoundManager.play('apuestaTick', { volume: 0.4 });
     });
     
     currentBet = Math.min(1, score);
@@ -818,6 +996,8 @@ function renderLevel3() {
             alert('No tienes suficientes puntos');
             return;
         }
+        // Reproducir sonido de lanzar
+        SoundManager.play('btnLanzar');
         executeCoinFlip();
     });
     
@@ -855,7 +1035,12 @@ function executeCoinFlip() {
     // Animación de lanzamiento - agregar clase de flip
     coin.classList.add('coin-flipping');
     
+    // Reproducir sonido de moneda girando
+    SoundManager.play('coinSpinning', { loop: true });
+    
     setTimeout(() => {
+        // Detener sonido de moneda girando
+        SoundManager.stop('coinSpinning');
         // Generar resultado aleatorio
         const result = Math.random() < 0.5 ? 'cara' : 'sello';
         
@@ -953,9 +1138,13 @@ function showCoinFlipResult(won, payout, result) {
         const pointsGained = payout - currentBet; // Ganancia neta
         pointsText.textContent = `+${formatScoreValue(pointsGained)}`;
         pointsText.classList.add('points-positive');
+        // Reproducir sonido de acierto
+        SoundManager.play('aciertoJingle');
     } else {
         pointsText.textContent = `-${formatScoreValue(currentBet)}`;
         pointsText.classList.add('points-negative');
+        // Reproducir sonido de fallo
+        SoundManager.play('falloGrave');
     }
     messageDiv.appendChild(pointsText);
     
