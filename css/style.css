@@ -93,9 +93,7 @@ body {
 }
 
 .sound-toggle-btn {
-    position: absolute;
-    top: min(20px, 3vh);
-    right: min(5px, 1vw);
+    position: static;
     width: min(48px, 9vw);
     height: min(48px, 9vw);
     border: none;
@@ -109,14 +107,11 @@ body {
     cursor: pointer;
     transition: transform 0.2s ease, opacity 0.2s ease;
     z-index: 150;
+    margin-left: min(10px, 1.5vw);
 }
 
-.sound-toggle-btn:hover {
-    transform: scale(1.05);
-}
-
-.sound-toggle-btn:active {
-    transform: scale(0.95);
+.counters-bar {
+    gap: min(12px, 2vw);
 }
 
 .sound-toggle-icon {
