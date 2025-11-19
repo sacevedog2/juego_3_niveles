@@ -9,12 +9,14 @@ NIVEL 1 - assets/sounds/level1/
 3. btn-operacion-click.mp3 (o .ogg o .wav)
 4. resultado-positivo.mp3 (o .ogg o .wav)
 5. resultado-negativo.mp3 (o .ogg o .wav)
+6. background.mp3 (o .ogg o .wav) - Música/ambiente de fondo (se pausa cuando hay otros sonidos)
 
 NIVEL 2 - assets/sounds/level2/
 ───────────────────────────────────────────────────────────────
 1. btn-decision-click.mp3 (o .ogg o .wav)
 2. acierto-victoria.mp3 (o .ogg o .wav)
 3. error-fallo.mp3 (o .ogg o .wav)
+4. background.mp3 (o .ogg o .wav) - Música/ambiente de fondo (se pausa cuando hay otros sonidos)
 
 NIVEL 3 - assets/sounds/level3/
 ───────────────────────────────────────────────────────────────
@@ -24,9 +26,10 @@ NIVEL 3 - assets/sounds/level3/
 4. coin-spinning.mp3 (o .ogg o .wav)
 5. acierto-jingle.mp3 (o .ogg o .wav)
 6. fallo-grave.mp3 (o .ogg o .wav)
+7. background.mp3 (o .ogg o .wav) - Música/ambiente de fondo (se pausa cuando hay otros sonidos)
 
 ═══════════════════════════════════════════════════════════════
-TOTAL: 14 archivos de sonido
+TOTAL: 17 archivos de sonido
 ═══════════════════════════════════════════════════════════════
 
 NOTA: Puedes usar la extensión .mp3, .ogg o .wav según prefieras.

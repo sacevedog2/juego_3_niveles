@@ -25,8 +25,11 @@ assets/sounds/
 | `btn-operacion-click.mp3` | Click ligero al presionar botones de operaciones (+, -, ×, ÷) | MP3 / OGG / WAV |
 | `resultado-positivo.mp3` | Tono ascendente brillante cuando se acierta | MP3 / OGG / WAV |
 | `resultado-negativo.mp3` | Tono descendente o "bump" apagado cuando se falla | MP3 / OGG / WAV |
+| `background.mp3` | Música/ambiente de fondo para el nivel (reproduce en loop, se pausa cuando hay otros sonidos) | MP3 / OGG / WAV |
 
 **Nota:** El sonido `btn-operacion-click.mp3` se usará para todos los botones de operaciones (+, -, ×, ÷).
+
+**Sonido de fondo:** Se reproduce en loop al 60% de volumen durante el nivel. Se pausa automáticamente cuando se reproducen otros sonidos y se reanuda cuando terminan.
 
 ---
 
@@ -39,6 +42,7 @@ assets/sounds/
 | `btn-decision-click.mp3` | Click suave al presionar botones de decisión (Menor, Igual, Mayor) | MP3 / OGG / WAV |
 | `acierto-victoria.mp3` | Chime ascendente de 2-3 tonos cuando se acierta | MP3 / OGG / WAV |
 | `error-fallo.mp3` | Sonido de error leve: bump o tono descendente corto cuando se falla | MP3 / OGG / WAV |
+| `background.mp3` | Música/ambiente de fondo para el nivel (reproduce en loop, se pausa cuando hay otros sonidos) | MP3 / OGG / WAV |
 
 ---
 
@@ -54,32 +58,36 @@ assets/sounds/
 | `coin-spinning.mp3` | Sonido de moneda girando (mientras está en el aire) - estilo metálico o woosh continuo | MP3 / OGG / WAV |
 | `acierto-jingle.mp3` | Pequeño jingle ascendente o chime dinámico cuando se acierta | MP3 / OGG / WAV |
 | `fallo-grave.mp3` | Tono grave, corto y apagado cuando se falla | MP3 / OGG / WAV |
+| `background.mp3` | Música/ambiente de fondo para el nivel (reproduce en loop, se pausa cuando hay otros sonidos) | MP3 / OGG / WAV |
 
 ---
 
 ## 📋 RESUMEN DE ARCHIVOS A CREAR
 
-### Total: 14 archivos de sonido
+### Total: 17 archivos de sonido
 
-**Nivel 1 (5 archivos):**
+**Nivel 1 (6 archivos):**
 1. `btn-girar-click.mp3`
 2. `dice-rolling.mp3`
 3. `btn-operacion-click.mp3`
 4. `resultado-positivo.mp3`
 5. `resultado-negativo.mp3`
+6. `background.mp3` (música/ambiente de fondo - se pausa cuando hay otros sonidos)
 
-**Nivel 2 (3 archivos):**
+**Nivel 2 (4 archivos):**
 1. `btn-decision-click.mp3`
 2. `acierto-victoria.mp3`
 3. `error-fallo.mp3`
+4. `background.mp3` (música/ambiente de fondo - se pausa cuando hay otros sonidos)
 
-**Nivel 3 (6 archivos):**
+**Nivel 3 (7 archivos):**
 1. `btn-cara-sello-click.mp3`
 2. `apuesta-tick.mp3`
 3. `btn-lanzar.mp3`
 4. `coin-spinning.mp3`
 5. `acierto-jingle.mp3`
 6. `fallo-grave.mp3`
+7. `background.mp3` (música/ambiente de fondo - se pausa cuando hay otros sonidos)
 
 ---
 
@@ -103,4 +111,5 @@ Una vez que hayas importado todos los archivos de sonido, el código JavaScript 
 - Sonido de dado rodando: 1 - 2 segundos (loop mientras gira)
 - Sonido de lanzar moneda: 1 - 2 segundos
 - Sonido de moneda girando: 1 - 1.5 segundos (loop mientras gira)
+- Sonido de fondo: 30 - 120 segundos (loop continuo durante el nivel, volumen al 60%, se pausa automáticamente cuando hay otros sonidos)
 

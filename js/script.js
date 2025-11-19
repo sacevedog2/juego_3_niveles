@@ -7,12 +7,15 @@ const SoundManager = {
     loadSound(name, basePath) {
         if (this.sounds[name]) return this.sounds[name];
         
-        // Intentar cargar con diferentes formatos (prioridad: wav, mp3, ogg)
-        const formats = ['wav', 'mp3', 'ogg'];
+        // Determinar formato prioritario según el tipo de sonido
+        // Los sonidos de fondo son .mp3, los demás principalmente .wav
+        const isBackground = name.includes('Bg');
+        const formats = isBackground ? ['mp3', 'wav', 'ogg'] : ['wav', 'mp3', 'ogg'];
+        
         const audio = new Audio();
         
-        // Intentar con wav primero (la mayoría de archivos son .wav)
-        audio.src = `${basePath}.wav`;
+        // Intentar con el primer formato
+        audio.src = `${basePath}.${formats[0]}`;
         audio.preload = 'auto';
         audio.volume = 0.7;
         
@@ -48,6 +51,9 @@ const SoundManager = {
     
     // Reproducir un sonido
     play(name, options = {}) {
+        // Si es un sonido de fondo, no pausar otros sonidos
+        const isBackgroundSound = name.includes('Bg');
+        
         if (!this.sounds[name]) {
             console.warn(`Sonido ${name} no encontrado. Intentando cargar...`);
             // Intentar cargar de nuevo si no está disponible
@@ -74,7 +80,10 @@ const SoundManager = {
                 'btnLanzar': 'assets/sounds/level3/btn-lanzar.wav',
                 'coinSpinning': 'assets/sounds/level3/coin-spinning.wav',
                 'aciertoJingle': 'assets/sounds/level3/acierto-jingle.wav',
-                'falloGrave': 'assets/sounds/level3/fallo-grave.wav'
+                'falloGrave': 'assets/sounds/level3/fallo-grave.wav',
+                'level1Bg': 'assets/sounds/level1/background.mp3',
+                'level2Bg': 'assets/sounds/level2/background.mp3',
+                'level3Bg': 'assets/sounds/level3/background.mp3'
             };
             
             if (pathMap[name]) {
@@ -94,6 +103,15 @@ const SoundManager = {
             this.currentLoopingSounds[name] = audio;
         }
         
+        // Si NO es sonido de fondo, pausar música de fondo y registrar como activo
+        if (!isBackgroundSound) {
+            this.pauseBackgroundMusic();
+            this.registerActiveSound(audio);
+            
+            // Para sonidos en loop, no esperar a que terminen (no tienen 'ended')
+            // Se manejarán cuando se llame a stop()
+        }
+        
         // Intentar reproducir
         const playPromise = audio.play();
         if (playPromise !== undefined) {
@@ -111,9 +129,18 @@ const SoundManager = {
     // Detener un sonido que está en loop
     stop(name) {
         if (this.currentLoopingSounds[name]) {
-            this.currentLoopingSounds[name].pause();
-            this.currentLoopingSounds[name].currentTime = 0;
+            const audio = this.currentLoopingSounds[name];
+            audio.pause();
+            audio.currentTime = 0;
             delete this.currentLoopingSounds[name];
+            
+            // Remover de sonidos activos si está ahí
+            this.activeSounds = this.activeSounds.filter(s => s !== audio);
+            
+            // Si no hay más sonidos activos, reanudar música de fondo
+            if (this.activeSounds.length === 0) {
+                this.resumeBackgroundMusic();
+            }
         }
     },
     
@@ -122,6 +149,70 @@ const SoundManager = {
         Object.keys(this.currentLoopingSounds).forEach(name => {
             this.stop(name);
         });
+    },
+    
+    currentBackgroundSound: null, // Referencia al sonido de fondo actual
+    activeSounds: [], // Lista de sonidos activos (no de fondo)
+    
+    // Reproducir sonido de fondo de un nivel
+    playBackgroundMusic(level) {
+        // Detener el sonido de fondo anterior si existe
+        if (this.currentBackgroundSound) {
+            this.stopBackgroundMusic();
+        }
+        
+        const soundName = `level${level}Bg`;
+        const audio = this.play(soundName, { 
+            loop: true, 
+            volume: 0.6 // 60% de volumen
+        });
+        
+        if (audio) {
+            this.currentBackgroundSound = audio;
+        }
+    },
+    
+    // Pausar música de fondo (cuando hay otros sonidos)
+    pauseBackgroundMusic() {
+        if (this.currentBackgroundSound && !this.currentBackgroundSound.paused) {
+            this.currentBackgroundSound.pause();
+        }
+    },
+    
+    // Reanudar música de fondo (cuando no hay otros sonidos)
+    resumeBackgroundMusic() {
+        if (this.currentBackgroundSound && this.currentBackgroundSound.paused) {
+            this.currentBackgroundSound.play().catch(err => {
+                // Ignorar errores de autoplay
+            });
+        }
+    },
+    
+    // Detener música de fondo
+    stopBackgroundMusic() {
+        if (this.currentBackgroundSound) {
+            this.currentBackgroundSound.pause();
+            this.currentBackgroundSound.currentTime = 0;
+            this.currentBackgroundSound = null;
+        }
+    },
+    
+    // Registrar un sonido activo (no de fondo)
+    registerActiveSound(audio) {
+        if (audio && !this.activeSounds.includes(audio)) {
+            this.activeSounds.push(audio);
+            // Pausar música de fondo mientras hay sonidos activos
+            this.pauseBackgroundMusic();
+            
+            // Cuando termine el sonido, removerlo de la lista
+            audio.addEventListener('ended', () => {
+                this.activeSounds = this.activeSounds.filter(s => s !== audio);
+                // Si no hay más sonidos activos, reanudar música de fondo
+                if (this.activeSounds.length === 0) {
+                    this.resumeBackgroundMusic();
+                }
+            }, { once: true });
+        }
     }
 };
 
@@ -143,6 +234,11 @@ SoundManager.loadSound('btnLanzar', 'assets/sounds/level3/btn-lanzar');
 SoundManager.loadSound('coinSpinning', 'assets/sounds/level3/coin-spinning');
 SoundManager.loadSound('aciertoJingle', 'assets/sounds/level3/acierto-jingle');
 SoundManager.loadSound('falloGrave', 'assets/sounds/level3/fallo-grave');
+
+// Cargar sonidos de fondo para cada nivel (solo uno por nivel)
+SoundManager.loadSound('level1Bg', 'assets/sounds/level1/background');
+SoundManager.loadSound('level2Bg', 'assets/sounds/level2/background');
+SoundManager.loadSound('level3Bg', 'assets/sounds/level3/background');
 
 const dice = document.querySelector('.dice');
 const rollBtn = document.querySelector('.action-button');
@@ -433,6 +529,9 @@ function startLevel2() {
     roundsRemaining = 10;
     // Update visual background for level 2
     setGameScreenLevel(2);
+    
+    // Reproducir música de fondo del nivel 2
+    SoundManager.playBackgroundMusic(2);
     
     // Update header image for level 2
     const headerImg = document.querySelector('.header-image');
@@ -762,6 +861,9 @@ function endGame() {
 // Initialize display
 updateScoreDisplay();
 
+// Reproducir música de fondo del nivel 1 al cargar
+SoundManager.playBackgroundMusic(1);
+
 // ========== LEVEL 3: Coin Flip Betting Game ==========
 
 function startLevel3() {
@@ -772,6 +874,9 @@ function startLevel3() {
 
     // Update visual background for level 3
     setGameScreenLevel(3);
+    
+    // Reproducir música de fondo del nivel 3
+    SoundManager.playBackgroundMusic(3);
     
     // Update header image for level 3
     const headerImg = document.querySelector('.header-image');
