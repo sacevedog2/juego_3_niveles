@@ -1357,3 +1357,20 @@ body {
     object-fit: contain;
     display: block;
 }
+
+/* Añádelo al final de css/style.css */
+@media (max-width: 600px) {
+    html, body {
+      overflow-y: auto;
+    }
+  
+    .game-screen {
+      height: auto;
+      min-height: 100vh;
+      max-width: 100%;
+    }
+  
+    .wrapper {
+      padding-bottom: 80px; /* espacio extra para el final del contenido */
+    }
+  }
