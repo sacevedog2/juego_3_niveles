@@ -1374,3 +1374,51 @@ body {
       padding-bottom: 80px; /* espacio extra para el final del contenido */
     }
   }
+/* Soporte global para pantallas angostas/altas */
+@media (max-width: 768px) {
+    html, body {
+      min-height: 100vh;
+      overflow-y: auto;
+    }
+  
+    .game-screen {
+      width: 100%;
+      height: auto;
+      min-height: 100vh;
+      max-width: 100%;
+      overflow: visible;       /* permite que nada se corte */
+    }
+  
+    .wrapper {
+      padding-bottom: 90px;    /* espacio para contenido al final */
+    }
+  
+    .level-header {
+      margin-top: min(70px, 12vh);
+    }
+  
+    .dice-container {
+      width: min(380px, 92vw);
+    }
+  
+    .cards {
+      flex-wrap: wrap;
+    }
+  }
+  
+  /* Para móviles muy estrechos o con notch pronunciado */
+  @media (max-width: 480px) {
+    .counters-bar {
+      top: min(10px, 2vh);
+      padding: 0 min(12px, 3vw);
+    }
+  
+    .sound-toggle-btn {
+      top: min(10px, 2vh);
+      right: min(4px, 1.2vw);
+    }
+  
+    .wrapper {
+      padding-bottom: 110px;
+    }
+  }
