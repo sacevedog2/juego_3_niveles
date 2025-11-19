@@ -278,7 +278,7 @@ rollBtn.addEventListener('click', () => {
 // `score` is null until the first roll — this avoids multiplying by 0
 let score = null;
 // availableOps will hold the operations currently available as strings
-let availableOps = ['+', '-', '×', '÷'];
+let availableOps = ['+', '-', '\u00D7', '\u00F7']; // × y ÷ en Unicode
 let pendingOp = null; // holds the operation chosen that will be applied with the next roll
 
 // --- Level 2 (Card Prediction Game) state ---
@@ -332,8 +332,8 @@ function renderCards(value) {
     const opImages = {
         '+': 'assets/ui/level1/btn-plus.png',
         '-': 'assets/ui/level1/btn-minus.png',
-        '×': 'assets/ui/level1/btn-times.png',
-        '÷': 'assets/ui/level1/btn-divide.png'
+        '\u00D7': 'assets/ui/level1/btn-times.png', // ×
+        '\u00F7': 'assets/ui/level1/btn-divide.png' // ÷
     };
 
     // Render only the currently available operations
@@ -403,10 +403,10 @@ function applyOperation(op, value) {
         case '-':
             score = score - v;
             break;
-        case '×':
+        case '\u00D7': // ×
             score = score * v;
             break;
-        case '÷':
+        case '\u00F7': // ÷
             // Avoid division by zero
             if (v === 0) break;
             // Usar división en punto flotante; no truncar para permitir decimales
