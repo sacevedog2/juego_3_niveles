@@ -576,9 +576,11 @@ function applyOperation(op, value) {
 // ========== LEVEL 2: Card Prediction Game ==========
 
 function startLevel2() {
-    // Eliminar botón Next si existe
+    // Eliminar botones de intro si existen
     const existingNextBtn = document.querySelector('.intro-next-btn');
     if (existingNextBtn) existingNextBtn.remove();
+    const existingPlayBtn = document.querySelector('.intro-play-btn');
+    if (existingPlayBtn) existingPlayBtn.remove();
     
     // Restaurar fondo del nivel 2
     const gameScreen = document.querySelector('.game-screen');
@@ -931,9 +933,11 @@ function endGame() {
 
 // Iniciar nivel 1
 function startLevel1() {
-    // Eliminar botón Next si existe
+    // Eliminar botones de intro si existen
     const existingNextBtn = document.querySelector('.intro-next-btn');
     if (existingNextBtn) existingNextBtn.remove();
+    const existingPlayBtn = document.querySelector('.intro-play-btn');
+    if (existingPlayBtn) existingPlayBtn.remove();
     
     // Restaurar fondo del nivel 1
     const gameScreen = document.querySelector('.game-screen');
@@ -983,9 +987,11 @@ function startLevel1() {
 function showIntroScreen(introIndex) {
     if (!cardsContainer) return;
     
-    // Eliminar botón Next anterior si existe
+    // Eliminar botones de intro anteriores si existen
     const existingNextBtn = document.querySelector('.intro-next-btn');
     if (existingNextBtn) existingNextBtn.remove();
+    const existingPlayBtn = document.querySelector('.intro-play-btn');
+    if (existingPlayBtn && existingPlayBtn.parentNode === document.body) existingPlayBtn.remove();
     
     // Ocultar contadores mientras se muestra la intro
     const countersBar = document.querySelector('.counters-bar');
@@ -1059,7 +1065,7 @@ function showIntroScreen(introIndex) {
         const playBtn = document.createElement('button');
         playBtn.className = 'intro-play-btn';
         playBtn.style.position = 'absolute';
-        playBtn.style.top = '80%'; // Ajuste para evitar que se corte
+        playBtn.style.top = '85%'; // Ajuste para evitar que se corte
         playBtn.style.left = '50%';
         playBtn.style.transform = 'translateX(-50%)';
         playBtn.style.background = 'none';
@@ -1103,45 +1109,46 @@ function showIntroScreen(introIndex) {
         cardsContainer.appendChild(introContainer);
     }
     
-    // Botón Next (SOLO en intro1, intro2, intro3)
+    // Botón Play (en intro1, intro2, intro3 para navegar)
     if (introIndex > 0) {
-        const nextBtn = document.createElement('button');
-        nextBtn.className = 'intro-next-btn';
-        nextBtn.style.position = 'fixed';
-        nextBtn.style.bottom = '20px';
-        nextBtn.style.right = '20px';
-        nextBtn.style.background = 'rgba(0, 0, 0, 0.3)';
-        nextBtn.style.border = 'none';
-        nextBtn.style.borderRadius = '50%';
-        nextBtn.style.padding = '10px';
-        nextBtn.style.cursor = 'pointer';
-        nextBtn.style.opacity = '0.7';
-        nextBtn.style.transition = 'all 0.2s';
-        nextBtn.style.width = '50px';
-        nextBtn.style.height = '50px';
-        nextBtn.style.display = 'flex';
-        nextBtn.style.alignItems = 'center';
-        nextBtn.style.justifyContent = 'center';
-        nextBtn.style.zIndex = '9999';
+        const playBtn = document.createElement('button');
+        playBtn.className = 'intro-play-btn';
+        playBtn.style.position = 'absolute';
+        playBtn.style.top = '85%';
+        playBtn.style.left = '50%';
+        playBtn.style.transform = 'translateX(-50%)';
+        playBtn.style.background = 'none';
+        playBtn.style.border = 'none';
+        playBtn.style.borderRadius = '15px';
+        playBtn.style.padding = '0';
+        playBtn.style.cursor = 'pointer';
+        playBtn.style.opacity = '0.9';
+        playBtn.style.transition = 'opacity 0.2s, transform 0.2s';
+        playBtn.style.zIndex = '10';
+        playBtn.style.overflow = 'visible';
         
-        nextBtn.addEventListener('mouseenter', () => {
-            nextBtn.style.opacity = '1';
-            nextBtn.style.background = 'rgba(0, 0, 0, 0.5)';
+        playBtn.addEventListener('mouseenter', () => {
+            playBtn.style.opacity = '1';
+            playBtn.style.transform = 'translateX(-50%) scale(1.05)';
         });
-        nextBtn.addEventListener('mouseleave', () => {
-            nextBtn.style.opacity = '0.7';
-            nextBtn.style.background = 'rgba(0, 0, 0, 0.3)';
+        playBtn.addEventListener('mouseleave', () => {
+            playBtn.style.opacity = '0.9';
+            playBtn.style.transform = 'translateX(-50%) scale(1)';
         });
         
-        const nextImg = document.createElement('img');
-        nextImg.src = 'assets/ui/common/next.png';
-        nextImg.alt = 'Siguiente';
-        nextImg.style.width = '30px';
-        nextImg.style.height = '30px';
-        nextImg.style.objectFit = 'contain';
-        nextBtn.appendChild(nextImg);
+        const playImg = document.createElement('img');
+        playImg.src = 'assets/ui/common/play.png';
+        playImg.alt = 'Jugar';
+        playImg.style.display = 'block';
+        playImg.style.width = '100%';
+        playImg.style.height = 'auto';
+        playImg.style.maxWidth = '220px';
+        playImg.style.maxHeight = '90px';
+        playImg.style.objectFit = 'contain';
+        playImg.style.borderRadius = '15px';
+        playBtn.appendChild(playImg);
         
-        nextBtn.addEventListener('click', () => {
+        playBtn.addEventListener('click', () => {
             SoundManager.play('btnOperacionClick');
             if (introIndex === 1) {
                 startLevel1();
@@ -1152,7 +1159,7 @@ function showIntroScreen(introIndex) {
             }
         });
         
-        document.body.appendChild(nextBtn);
+        cardsContainer.appendChild(playBtn);
     }
 }
 
@@ -1165,9 +1172,11 @@ showIntroScreen(0);
 // ========== LEVEL 3: Coin Flip Betting Game ==========
 
 function startLevel3() {
-    // Eliminar botón Next si existe
+    // Eliminar botones de intro si existen
     const existingNextBtn = document.querySelector('.intro-next-btn');
     if (existingNextBtn) existingNextBtn.remove();
+    const existingPlayBtn = document.querySelector('.intro-play-btn');
+    if (existingPlayBtn) existingPlayBtn.remove();
     
     // Restaurar fondo del nivel 3
     const gameScreen = document.querySelector('.game-screen');

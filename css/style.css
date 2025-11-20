@@ -257,8 +257,8 @@ body {
 /* Operation buttons */
 .operation-buttons {
     display: flex;
-    gap: min(10px, 1vw);
-    margin-top: 0;
+    gap: min(8px, 0.8vw);
+    margin-top: -10px;
     justify-content: center;
     flex-wrap: wrap;
     padding: 0 10px;
@@ -268,8 +268,8 @@ body {
 }
 
 .op-button {
-    width: min(70px, 15vw);
-    height: min(70px, 15vw);
+    width: min(60px, 12vw);
+    height: min(60px, 12vw);
     background: none;
     border: none;
     padding: 0;
@@ -444,7 +444,7 @@ body {
     .intro-play-btn {
         max-width: 180px !important;
         max-height: 70px !important;
-        top: 70% !important; /* Ajustar posición en móvil */
+        top: 75% !important; /* Ajustar posición en móvil */
     }
     
     .sound-toggle-btn {
@@ -479,7 +479,7 @@ body {
     .intro-play-btn {
         max-width: 160px !important;
         max-height: 60px !important;
-        top: 65% !important; /* Ajustar posición en móvil pequeño */
+        top: 70% !important; /* Ajustar posición en móvil pequeño */
     }
     
     .sound-toggle-btn {
@@ -501,7 +501,7 @@ body {
 /* Para pantallas muy pequeñas en altura */
 @media (max-height: 600px) {
     .intro-play-btn {
-        top: 60% !important;
+        top: 65% !important;
     }
     
     .intro-container {
@@ -671,26 +671,35 @@ body {
     position: relative;
     display: none; /* Hidden by default, shown after first roll */
     flex-direction: row;
-    gap: 10px;
+    gap: 8px;
     z-index: 60;
     justify-content: center;
     align-items: center;
     pointer-events: auto;
-    margin-top: 5px;
+    margin-top: -4px;
     margin-bottom: 0;
     flex-wrap: nowrap;
     width: 100%;
     overflow: visible;
+    order: 2;
+}
+
+.game-container {
+    gap: 10px;
+}
+
+.action-button {
+    order: 3;
 }
 
 /* Desktop: reducir gap para que los botones no queden tan abajo */
 @media (min-width: 769px) {
     .game-container {
-        gap: 8px;
+        gap: 6px;
     }
     
     .cards {
-        margin-top: 3px;
+        margin-top: -6px;
     }
 }
 
@@ -699,8 +708,8 @@ body {
     border: none;
     padding: 0;
     cursor: pointer;
-    width: min(70px, 15vw);
-    height: min(70px, 15vw);
+    width: min(60px, 12vw);
+    height: min(60px, 12vw);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1067,16 +1076,16 @@ body {
 }
 
 .flips-remaining-indicator {
-    font: 700 min(12px, 2.2vw) 'Montserrat';
-    color: #ffffff;
+    font: 700 min(20px, 4vw) 'Montserrat';
+    color: #003366;
     text-align: center;
-    background: #c9e5ff;
+    background: transparent;
     padding: 10px 10px 6px 10px;
     border-radius: 5px;
     margin-bottom: 0px;
-    margin-top: 5px;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    margin-top: -10px;
+    text-shadow: none;
+    box-shadow: none;
     white-space: nowrap;
     max-width: 95%;
     line-height: 1.6;
