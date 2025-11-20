@@ -1015,7 +1015,10 @@ function showIntroScreen(introIndex) {
     const gameScreen = document.querySelector('.game-screen');
     if (gameScreen) {
         if (introIndex === 0) {
-            // Intro general: mantener fondo actual
+            // Intro general: usar fondo de nivel 1
+            gameScreen.style.backgroundImage = 'url(assets/Fondolevel1.png)';
+            gameScreen.style.backgroundSize = 'cover';
+            gameScreen.style.backgroundPosition = 'center';
         } else if (introIndex === 1) {
             gameScreen.style.backgroundImage = 'url(assets/ui/level1/intro1.png)';
             gameScreen.style.backgroundSize = 'cover';
@@ -1159,7 +1162,13 @@ function showIntroScreen(introIndex) {
             }
         });
         
-        cardsContainer.appendChild(playBtn);
+        // Agregar el botón al game-screen en lugar de cardsContainer para posicionamiento correcto
+        const gameScreen = document.querySelector('.game-screen');
+        if (gameScreen) {
+            gameScreen.appendChild(playBtn);
+        } else {
+            cardsContainer.appendChild(playBtn);
+        }
     }
 }
 
@@ -1256,8 +1265,8 @@ function renderLevel3() {
     const coinContainerDiv = document.createElement('div');
     coinContainerDiv.className = 'coin-container-wrapper';
     coinContainerDiv.style.position = 'relative';
-    coinContainerDiv.style.width = 'min(160px, 35vw)';
-    coinContainerDiv.style.height = 'min(160px, 35vw)';
+    coinContainerDiv.style.width = 'min(400px, 72vw)';
+    coinContainerDiv.style.height = 'min(400px, 72vw)';
     coinContainerDiv.style.display = 'flex';
     coinContainerDiv.style.alignItems = 'center';
     coinContainerDiv.style.justifyContent = 'center';
