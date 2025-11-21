@@ -1062,13 +1062,19 @@ function showIntroScreen(introIndex) {
         introImg.style.maxWidth = '100%';
         introImg.style.maxHeight = '100%';
         introImg.style.objectFit = 'contain';
+        introImg.style.position = 'relative';
+        introImg.style.zIndex = '1';
+        introImg.style.pointerEvents = 'none';
         introContainer.appendChild(introImg);
         
+        cardsContainer.appendChild(introContainer);
+        
         // Botón Play (SOLO en la intro general - introIndex === 0)
+        // Colocado fuera del introContainer para evitar bloqueos
         const playBtn = document.createElement('button');
         playBtn.className = 'intro-play-btn';
         playBtn.style.position = 'absolute';
-        playBtn.style.top = '85%'; // Ajuste para evitar que se corte
+        playBtn.style.top = '85%';
         playBtn.style.left = '50%';
         playBtn.style.transform = 'translateX(-50%)';
         playBtn.style.background = 'none';
@@ -1078,8 +1084,11 @@ function showIntroScreen(introIndex) {
         playBtn.style.cursor = 'pointer';
         playBtn.style.opacity = '0.9';
         playBtn.style.transition = 'opacity 0.2s, transform 0.2s';
-        playBtn.style.zIndex = '10';
+        playBtn.style.zIndex = '300';
         playBtn.style.overflow = 'visible';
+        playBtn.style.pointerEvents = 'auto';
+        playBtn.style.width = 'auto';
+        playBtn.style.height = 'auto';
         
         playBtn.addEventListener('mouseenter', () => {
             playBtn.style.opacity = '1';
@@ -1100,16 +1109,18 @@ function showIntroScreen(introIndex) {
         playImg.style.maxHeight = '90px';
         playImg.style.objectFit = 'contain';
         playImg.style.borderRadius = '15px';
+        playImg.style.pointerEvents = 'none';
         playBtn.appendChild(playImg);
         
-        playBtn.addEventListener('click', () => {
+        playBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             SoundManager.play('btnOperacionClick');
             // Mostrar intro del nivel 1 antes de iniciarlo
             showIntroScreen(1);
         });
         
-        introContainer.appendChild(playBtn);
-        cardsContainer.appendChild(introContainer);
+        cardsContainer.appendChild(playBtn);
     }
     
     // Botón Play (en intro1, intro2, intro3 para navegar)
